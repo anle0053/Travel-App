@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="旅遊助手">
+<title>旅遊助手</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--c:#2e7d9f;--ca:#e8f4fd;--cb:#185fa5;--warn:#ba7517;--warnbg:#fff8f0;--warnborder:#fac775;--red:#d94f3d;--bg:#f5f5f0;--border:#eee;--sub:#888;--radius:14px}
+html,body{height:100%;overflow:hidden}
+body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;background:var(--bg);color:#222;font-size:15px}
+.app{display:flex;flex-direction:column;height:100vh;max-width:430px;margin:0 auto;background:#fff;position:relative}
+.header{background:var(--c);color:#fff;padding:52px 16px 14px;flex-shrink:0;display:flex;justify-content:space-between;align-items:flex-end}
+.header h1{font-size:17px;font-weight:600}
+.header .sub{font-size:12px;opacity:.8;margin-top:2px}
+.sync-dot{width:8px;height:8px;border-radius:50%;background:#4caf50;flex-shrink:0;margin-bottom:4px}
+.sync-dot.off{background:#ff5252}
+.sync-dot.syncing{background:#ffeb3b;animation:blink .8s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.pages{flex:1;overflow:hidden;position:relative}
+.page{position:absolute;inset:0;overflow-y:auto;padding:16px;display:none;-webkit-overflow-scrolling:touch}
+.page.active{display:block}
+.nav{display:flex;background:#fff;border-top:.5px solid #ddd;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;padding:10px 4px 8px;border:none;background:none;font-size:10px;color:var(--sub);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav-btn.active{color:var(--c)}
+.nav-icon{font-size:22px;line-height:1}
+
+.trip-card{background:linear-gradient(135deg,var(--c),#4aa8c8);color:#fff;border-radius:var(--radius);padding:20px;margin-bottom:14px}
+.trip-card h2{font-size:19px;font-weight:600;margin-bottom:4px}
+.trip-card .dates{font-size:12px;opacity:.85;margin-bottom:14px}
+.trip-stats{display:flex;gap:8px}
+.stat{background:rgba(255,255,255,.2);border-radius:10px;padding:10px;flex:1;text-align:center}
+.stat .num{font-size:20px;font-weight:600}
+.stat .lbl{font-size:10px;opacity:.85;margin-top:1px}
+.countdown{background:var(--ca);border:.5px solid #b5d4f4;border-radius:12px;padding:14px;text-align:center;margin-bottom:14px}
+.countdown .days{font-size:34px;font-weight:600;color:var(--c)}
+.countdown .lbl{font-size:12px;color:var(--sub);margin-top:3px}
+.sec-label{font-size:12px;color:var(--sub);margin-bottom:8px;font-weight:600;letter-spacing:.5px}
+.chip-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.chip{background:var(--ca);color:var(--cb);border:.5px solid #b5d4f4;border-radius:20px;padding:6px 13px;font-size:13px}
+.members-row{display:flex;gap:7px;margin-bottom:14px}
+.member{background:var(--ca);color:var(--cb);border:.5px solid #b5d4f4;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600}
+.weather-row{display:flex;gap:8px}
+.wx-card{background:#f0f8ff;border-radius:10px;padding:11px;flex:1;text-align:center}
+.wx-card .wc{font-size:11px;color:#555;margin-bottom:3px}
+.wx-card .wt{font-size:17px;font-weight:600;color:var(--cb)}
+.wx-card .wd{font-size:10px;color:var(--sub)}
+
+.day-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
+.day-scroll::-webkit-scrollbar{display:none}
+.day-btn{padding:7px 12px;border-radius:20px;border:.5px solid #ddd;background:#fff;font-size:11px;cursor:pointer;white-space:nowrap;color:#555;line-height:1.4;text-align:center;flex-shrink:0}
+.day-btn.active{background:var(--c);color:#fff;border-color:var(--c)}
+.stay-badge{background:var(--warnbg);border:.5px solid var(--warnborder);border-radius:8px;padding:6px 12px;font-size:12px;color:#633806;margin-bottom:12px;display:inline-flex;align-items:center;gap:5px}
+.itin-item{display:flex;gap:10px;margin-bottom:10px}
+.time-col{width:42px;font-size:11px;color:var(--sub);padding-top:4px;text-align:right;flex-shrink:0}
+.tl{width:2px;background:#eee;position:relative;flex-shrink:0}
+.dot{width:10px;height:10px;background:var(--c);border-radius:50%;position:absolute;top:5px;left:-4px}
+.itin-card{flex:1;background:#fff;border:.5px solid var(--border);border-radius:12px;padding:11px;position:relative}
+.itin-card h4{font-size:14px;font-weight:600;margin-bottom:4px;padding-right:24px}
+.itin-card .meta{font-size:11px;color:var(--sub);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.del-btn{position:absolute;top:10px;right:10px;background:none;border:none;font-size:16px;color:#ccc;cursor:pointer;line-height:1}
+.del-btn:hover{color:var(--red)}
+.tag{border-radius:6px;padding:2px 7px;font-size:11px}
+.tag-spot{background:var(--ca);color:var(--cb)}
+.tag-food{background:#fff8f0;color:#ba7517}
+.tag-shop{background:#fef3f0;color:var(--red)}
+.tag-move{background:#e8f5ee;color:#0f6e56}
+.tag-stay{background:#f0f0ff;color:#5050c8}
+.transport-hint{background:#e8f5ee;border-radius:9px;padding:8px 12px;margin:6px 0 6px 52px;font-size:12px;color:#0f6e56;display:flex;align-items:center;gap:5px}
+.add-btn{width:100%;margin-top:8px;padding:12px;border:.5px dashed #ccc;background:none;border-radius:12px;color:#aaa;font-size:13px;cursor:pointer}
+.add-btn:hover{border-color:var(--c);color:var(--c)}
+
+.search-wrap{margin-bottom:12px}
+.search-box{display:flex;align-items:center;gap:8px;background:#f0f0eb;border-radius:12px;padding:11px 13px}
+.search-box input{border:none;background:none;flex:1;font-size:15px;outline:none;color:#222}
+.search-btn{background:var(--c);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.cat-tabs{display:flex;gap:6px;margin-bottom:12px}
+.cat-tab{padding:7px 16px;border-radius:20px;border:.5px solid #ddd;background:#fff;font-size:13px;cursor:pointer;color:#555}
+.cat-tab.active{background:var(--c);color:#fff;border-color:var(--c)}
+.place-card{display:flex;gap:11px;background:#fff;border:.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:9px}
+.place-thumb{width:56px;height:56px;border-radius:10px;background:#eee;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px}
+.place-info h4{font-size:14px;font-weight:600;margin-bottom:3px}
+.place-info .addr{font-size:11px;color:var(--sub);margin-bottom:3px}
+.place-info .pdesc{font-size:12px;color:#444;margin-bottom:4px}
+.rating{font-size:12px;color:#ba7517}
+.ai-result-box{background:#f8f4ff;border:.5px solid #c5a9f5;border-radius:12px;padding:14px;margin-bottom:12px}
+.ai-label{font-size:11px;color:#6c3fc5;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.ai-badge{background:linear-gradient(90deg,#6c3fc5,var(--c));color:#fff;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:600}
+.dot-pulse{display:flex;gap:4px;align-items:center}
+.dot-pulse span{width:7px;height:7px;background:#6c3fc5;border-radius:50%;animation:pulse 1.2s infinite}
+.dot-pulse span:nth-child(2){animation-delay:.2s}
+.dot-pulse span:nth-child(3){animation-delay:.4s}
+@keyframes pulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
+
+.budget-card{background:var(--warnbg);border:.5px solid var(--warnborder);border-radius:var(--radius);padding:16px;margin-bottom:14px}
+.budget-card h3{font-size:13px;color:#633806;margin-bottom:11px;font-weight:600}
+.prog-bar{background:var(--warnborder);border-radius:4px;height:8px;margin-bottom:6px;overflow:hidden}
+.prog-fill{height:100%;background:var(--warn);border-radius:4px;transition:width .4s}
+.budget-nums{display:flex;justify-content:space-between;font-size:12px;color:#633806}
+.exp-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#fff;border:.5px solid var(--border);border-radius:10px;margin-bottom:8px}
+.exp-left{display:flex;align-items:center;gap:10px}
+.exp-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:#fff8f0}
+.exp-name{font-size:14px;font-weight:500}
+.exp-meta{font-size:11px;color:var(--sub)}
+.exp-right{display:flex;align-items:center;gap:8px}
+.exp-amt{font-size:15px;font-weight:600;color:#633806}
+.exp-del{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer}
+.exp-del:hover{color:var(--red)}
+.add-exp-btn{width:100%;padding:14px;background:var(--c);color:#fff;border:none;border-radius:12px;font-size:14px;cursor:pointer;font-weight:600}
+.empty{text-align:center;color:#bbb;padding:36px 0;font-size:13px;line-height:2}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:flex-end;justify-content:center}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:430px;max-width:100%}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
+.frow{margin-bottom:11px}
+.frow label{font-size:12px;color:var(--sub);display:block;margin-bottom:4px}
+.frow input,.frow select,.frow textarea{width:100%;padding:10px 12px;border:.5px solid #ddd;border-radius:9px;font-size:14px;background:#fff;color:#222;font-family:inherit}
+.frow textarea{resize:none;height:72px}
+.modal-btns{display:flex;gap:8px;margin-top:16px}
+.btn-cancel{flex:1;padding:13px;border:.5px solid #ddd;background:#fff;border-radius:11px;font-size:14px;cursor:pointer;color:#555}
+.btn-save{flex:1;padding:13px;border:none;background:var(--c);color:#fff;border-radius:11px;font-size:14px;cursor:pointer;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <div>
+      <h1>🗾 旅遊助手</h1>
+      <div class="sub">神奈川・東京之旅</div>
+    </div>
+    <div class="sync-dot off" id="sync-dot" title="Firebase 連線狀態"></div>
+  </div>
+
+  <div class="pages">
+    <!-- 首頁 -->
+    <div class="page active" id="page-home">
+      <div class="trip-card">
+        <h2>東京 · 橫濱 · 箱根 · 鎌倉</h2>
+        <div class="dates">2025年6月17日 ─ 6月22日</div>
+        <div class="trip-stats">
+          <div class="stat"><div class="num">6</div><div class="lbl">天數</div></div>
+          <div class="stat"><div class="num">4</div><div class="lbl">成員</div></div>
+          <div class="stat"><div class="num">5</div><div class="lbl">城市</div></div>
+        </div>
+      </div>
+      <div class="countdown"><div class="days" id="countdown">—</div><div class="lbl">距離出發還有幾天</div></div>
+      <div class="sec-label">旅遊成員</div>
+      <div class="members-row"><div class="member">Dan</div><div class="member">Co</div><div class="member">魚</div><div class="member">月</div></div>
+      <div class="sec-label">旅遊地區</div>
+      <div class="chip-row"><div class="chip">🗼 東京</div><div class="chip">⚓ 橫濱</div><div class="chip">🌋 箱根</div><div class="chip">🏯 鎌倉</div><div class="chip">🏰 小田原</div></div>
+      <div class="sec-label">六月天氣參考</div>
+      <div class="weather-row">
+        <div class="wx-card"><div class="wc">東京/橫濱</div><div class="wt">24°C</div><div class="wd">梅雨季·備雨具</div></div>
+        <div class="wx-card"><div class="wc">箱根</div><div class="wt">20°C</div><div class="wd">山區多霧</div></div>
+        <div class="wx-card"><div class="wc">鎌倉</div><div class="wt">23°C</div><div class="wd">濱海微涼</div></div>
+      </div>
+    </div>
+
+    <!-- 行程 -->
+    <div class="page" id="page-itinerary">
+      <div class="day-scroll" id="day-tabs"></div>
+      <div id="stay-badge"></div>
+      <div id="itin-body"></div>
+      <button class="add-btn" onclick="openSpotModal()">＋ 新增景點</button>
+    </div>
+
+    <!-- 探索 -->
+    <div class="page" id="page-explore">
+      <div class="search-wrap">
+        <div class="search-box">
+          <span style="color:#aaa;font-size:17px">🔍</span>
+          <input id="q-input" type="text" placeholder="搜尋附近景點、餐廳…" onkeydown="if(event.key==='Enter')doSearch()">
+          <button class="search-btn" onclick="doSearch()">搜尋</button>
+        </div>
+      </div>
+      <div class="cat-tabs">
+        <button class="cat-tab active" onclick="setCat(this,'景點')">景點</button>
+        <button class="cat-tab" onclick="setCat(this,'餐廳')">餐廳</button>
+        <button class="cat-tab" onclick="setCat(this,'購物')">購物</button>
+      </div>
+      <div id="ai-result"></div>
+      <div id="preset-list"></div>
+    </div>
+
+    <!-- 預算 -->
+    <div class="page" id="page-budget">
+      <div class="day-scroll" id="budget-day-tabs"></div>
+      <div class="budget-card">
+        <h3>預算總覽（4人）</h3>
+        <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+        <div class="budget-nums"><span>已記錄 <strong id="spent-total">¥0</strong></span><span>預算 <strong>¥200,000</strong></span></div>
+      </div>
+      <div id="exp-list"></div>
+      <button class="add-exp-btn" onclick="openExpModal()">＋ 新增花費</button>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <button class="nav-btn active" onclick="showPage('home',this)"><span class="nav-icon">🏠</span>首頁</button>
+    <button class="nav-btn" onclick="showPage('itinerary',this)"><span class="nav-icon">📅</span>行程</button>
+    <button class="nav-btn" onclick="showPage('explore',this)"><span class="nav-icon">✨</span>探索</button>
+    <button class="nav-btn" onclick="showPage('budget',this)"><span class="nav-icon">💴</span>預算</button>
+  </nav>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 新增景點 -->
+<div class="overlay" id="spot-modal">
+  <div class="modal">
+    <h3>新增景點</h3>
+    <div class="frow"><label>名稱</label><input id="s-name" placeholder="例：鶴岡八幡宮"></div>
+    <div class="frow"><label>時間</label><input id="s-time" type="time" value="10:00"></div>
+    <div class="frow"><label>類型</label><select id="s-type"><option>景點</option><option>餐廳</option><option>購物</option><option>交通</option><option>住宿</option></select></div>
+    <div class="frow"><label>備註</label><textarea id="s-note" placeholder="選填"></textarea></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('spot-modal')">取消</button>
+      <button class="btn-save" onclick="saveSpot()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增花費 -->
+<div class="overlay" id="exp-modal">
+  <div class="modal">
+    <h3>新增花費</h3>
+    <div class="frow"><label>項目</label><input id="e-name" placeholder="例：午餐"></div>
+    <div class="frow"><label>金額（日幣 ¥）</label><input id="e-amt" type="number" placeholder="0"></div>
+    <div class="frow"><label>類別</label><select id="e-cat"><option>餐飲</option><option>交通</option><option>景點門票</option><option>購物</option><option>住宿</option><option>其他</option></select></div>
+    <div class="frow"><label>日期</label><select id="e-day">
+      <option value="1">第1天 (6/17)</option><option value="2">第2天 (6/18)</option>
+      <option value="3">第3天 (6/19)</option><option value="4">第4天 (6/20)</option>
+      <option value="5">第5天 (6/21)</option><option value="6">第6天 (6/22)</option>
+    </select></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" onclick="closeModal('exp-modal')">取消</button>
+      <button class="btn-save" onclick="saveExp()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, orderBy, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDnY5wcb0QXOPXzAvRmrqltESS_U5afCS8",
+  authDomain: "travel-app-38ad8.firebaseapp.com",
+  projectId: "travel-app-38ad8",
+  storageBucket: "travel-app-38ad8.firebasestorage.app",
+  messagingSenderId: "306708070000",
+  appId: "1:306708070000:web:716f2db183d2e432357eb5"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const BUDGET = 200000;
+const DAYS = [
+  {l:'第1天',d:'6/17',c:'東京・橫濱',s:'大船'},
+  {l:'第2天',d:'6/18',c:'小田原',s:'箱根'},
+  {l:'第3天',d:'6/19',c:'箱根',s:'大船'},
+  {l:'第4天',d:'6/20',c:'鎌倉',s:'大船'},
+  {l:'第5天',d:'6/21',c:'橫濱',s:'大船'},
+  {l:'第6天',d:'6/22',c:'東京・返台',s:'返台'}
+];
+const ICONS={景點:'🏛',餐廳:'🍜',購物:'🛍',交通:'🚆',住宿:'🏨',餐飲:'🍱',景點門票:'🎟',其他:'📦'};
+const TAG={景點:'tag-spot',餐廳:'tag-food',購物:'tag-shop',交通:'tag-move',住宿:'tag-stay'};
+
+let curDay=0, curBudgetDay='all', curCat='景點';
+let spots={0:[],1:[],2:[],3:[],4:[],5:[]};
+let expenses=[];
+
+// 預設行程（只在 Firebase 空白時寫入）
+const DEFAULT_SPOTS = {
+  0:[{n:'成田/羽田入境',t:'--:--',type:'交通',note:'入境・換JR Pass・行李'},{n:'橫濱中華街',t:'14:00',type:'餐廳',note:'午餐散步'},{n:'山下公園',t:'16:00',type:'景點',note:'海濱散步・冰川丸'},{n:'大船入住',t:'19:00',type:'交通',note:'JR根岸線'}],
+  1:[{n:'大船→小田原',t:'08:30',type:'交通',note:'JR東海道線約40分'},{n:'小田原城',t:'10:00',type:'景點',note:'天守閣展望台'},{n:'海鮮定食午餐',t:'12:30',type:'餐廳',note:'小田原名物'},{n:'箱根湯本',t:'14:30',type:'景點',note:'溫泉街・足湯・手信'},{n:'箱根旅館入住',t:'17:00',type:'住宿',note:'懷石料理晚餐'}],
+  2:[{n:'箱根神社',t:'09:00',type:'景點',note:'湖中鳥居・朝霧最美'},{n:'大涌谷',t:'11:00',type:'景點',note:'黑玉子必吃'},{n:'蘆之湖遊覽船',t:'13:30',type:'景點',note:'富士山遠望'},{n:'箱根→大船',t:'15:30',type:'交通',note:'登山電車+JR'},{n:'大船晚餐',t:'19:00',type:'餐廳',note:'車站居酒屋'}],
+  3:[{n:'大船→鎌倉',t:'09:00',type:'交通',note:'JR 5分鐘'},{n:'鶴岡八幡宮',t:'09:30',type:'景點',note:'鎌倉總社'},{n:'小町通り',t:'11:00',type:'購物',note:'可樂餅・抹茶冰淇淋'},{n:'鎌倉大佛',t:'13:00',type:'景點',note:'高德院・可入佛內'},{n:'長谷寺',t:'14:30',type:'景點',note:'6月紫陽花盛開'},{n:'由比ヶ濱海灘',t:'16:00',type:'景點',note:'夕陽散步'},{n:'鎌倉→大船',t:'17:30',type:'交通',note:'JR 5分鐘'}],
+  4:[{n:'橫濱紅磚倉庫',t:'10:00',type:'景點',note:'港灣景觀・紀念品'},{n:'麵包超人博物館',t:'12:00',type:'景點',note:'全家同樂'},{n:'中華街晚餐',t:'18:00',type:'餐廳',note:'廣東料理・建議訂位'}],
+  5:[{n:'大船→東京',t:'08:00',type:'交通',note:'JR東海道線約45分'},{n:'淺草寺',t:'09:30',type:'景點',note:'雷門・仲見世通'},{n:'藥妝採購',t:'13:00',type:'購物',note:'零食・伴手禮'},{n:'機場出發',t:'17:00',type:'交通',note:'提早3小時到機場'}]
+};
+
+// toast
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2200);
+}
+
+// sync dot
+function setSyncDot(state){
+  const d=document.getElementById('sync-dot');
+  d.className='sync-dot '+(state==='on'?'on':state==='syncing'?'syncing':'off');
+}
+
+// nav
+window.showPage=function(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+};
+
+// --- ITINERARY ---
+function renderDayTabs(){
+  document.getElementById('day-tabs').innerHTML=DAYS.map((d,i)=>
+    `<button class="day-btn${i===curDay?' active':''}" onclick="window.setDay(${i})">${d.l}<br><span style="opacity:.7;font-size:10px">${d.d} ${d.c}</span></button>`
+  ).join('');
+}
+window.setDay=function(i){curDay=i;renderDayTabs();renderItinerary();};
+
+function renderItinerary(){
+  const items=(spots[curDay]||[]).slice().sort((a,b)=>a.t.localeCompare(b.t));
+  const d=DAYS[curDay];
+  document.getElementById('stay-badge').innerHTML=
+    `<div class="stay-badge">🏨 今晚：${d.s==='返台'?'返回台灣':d.s+'附近'}</div>`;
+  if(!items.length){
+    document.getElementById('itin-body').innerHTML='<div class="empty">今天還沒有行程<br>點下方「＋ 新增景點」開始規劃</div>';
+    return;
+  }
+  document.getElementById('itin-body').innerHTML=items.map(s=>`
+    <div class="itin-item">
+      <div class="time-col">${s.t}</div>
+      <div class="tl"><div class="dot"></div></div>
+      <div class="itin-card">
+        <button class="del-btn" onclick="window.delSpot('${s.id}')">✕</button>
+        <h4>${ICONS[s.type]||'📍'} ${s.n}</h4>
+        <div class="meta"><span class="tag ${TAG[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span>${s.note}</span>`:''}</div>
+      </div>
+    </div>`).join('');
+}
+
+window.delSpot=async function(id){
+  if(!confirm('確定刪除這個景點？'))return;
+  await deleteDoc(doc(db,'spots',id));
+  toast('景點已刪除');
+};
+
+window.openSpotModal=function(){
+  document.getElementById('s-name').value='';
+  document.getElementById('s-note').value='';
+  document.getElementById('spot-modal').classList.add('open');
+};
+window.saveSpot=async function(){
+  const n=document.getElementById('s-name').value.trim();
+  if(!n)return;
+  setSyncDot('syncing');
+  await addDoc(collection(db,'spots'),{
+    n, t:document.getElementById('s-time').value,
+    type:document.getElementById('s-type').value,
+    note:document.getElementById('s-note').value,
+    day:curDay, ts:serverTimestamp()
+  });
+  closeModal('spot-modal');
+  toast('景點已儲存 ✓');
+  setSyncDot('on');
+};
+
+// listen spots
+onSnapshot(query(collection(db,'spots'),orderBy('ts')), snap=>{
+  spots={0:[],1:[],2:[],3:[],4:[],5:[]};
+  snap.forEach(d=>{const x={...d.data(),id:d.id};(spots[x.day]=spots[x.day]||[]).push(x);});
+  setSyncDot('on');
+  renderItinerary();
+
+  // 如果完全空白，寫入預設行程
+  if(snap.empty){
+    setSyncDot('syncing');
+    Object.entries(DEFAULT_SPOTS).forEach(([day,items])=>{
+      items.forEach((s,i)=>addDoc(collection(db,'spots'),{...s,day:parseInt(day),ts:serverTimestamp()}));
+    });
+  }
+}, err=>{setSyncDot('off');console.error(err);});
+
+// --- EXPLORE ---
+const presets={
+  景點:[
+    {name:'箱根神社',city:'箱根',desc:'湖中鳥居，朝霧與富士山同框',tip:'早上8點前人少',rating:4.8,icon:'⛩'},
+    {name:'鶴岡八幡宮',city:'鎌倉',desc:'鎌倉最重要神社，必訪地標',tip:'入場免費',rating:4.7,icon:'🏯'},
+    {name:'大涌谷',city:'箱根',desc:'火山地熱帶，黑玉子必吃',tip:'纜車可能因天氣停駛',rating:4.6,icon:'🌋'},
+    {name:'長谷寺',city:'鎌倉',desc:'6月紫陽花盛開，景色壯觀',tip:'建議平日早上前往',rating:4.6,icon:'🌸'},
+    {name:'橫濱紅磚倉庫',city:'橫濱',desc:'港灣景觀，餐廳與精品聚集',tip:'免費入場',rating:4.5,icon:'🧱'}
+  ],
+  餐廳:[
+    {name:'橫濱中華街',city:'橫濱',desc:'日本最大中華街，600家餐廳',tip:'平日午餐較不擠',rating:4.5,icon:'🥢'},
+    {name:'小田原海鮮市場',city:'小田原',desc:'港口直送海鮮丼與烤魚',tip:'早上10點最新鮮',rating:4.6,icon:'🦐'},
+    {name:'箱根懷石料理',city:'箱根',desc:'溫泉旅館季節食材精緻套餐',tip:'需提前預約',rating:4.7,icon:'🍱'},
+    {name:'鎌倉小町通り',city:'鎌倉',desc:'可樂餅、抹茶冰、鯛魚燒',tip:'邊走邊吃最對味',rating:4.5,icon:'🍡'},
+    {name:'大船居酒屋',city:'大船',desc:'車站旁多間居酒屋，燒鳥實惠',tip:'晚上6點後熱鬧',rating:4.3,icon:'🍺'}
+  ],
+  購物:[
+    {name:'淺草仲見世通',city:'東京',desc:'百年老店和菓子與傳統工藝品',tip:'人形燒現烤最香',rating:4.6,icon:'🏮'},
+    {name:'箱根湯本手信街',city:'箱根',desc:'溫泉饅頭、木工藝品、漆器',tip:'車站附近最集中',rating:4.4,icon:'🛍'},
+    {name:'小田原蒲鉾老舖',city:'小田原',desc:'魚板小田原名物，可現場體驗製作',tip:'建議早上去',rating:4.5,icon:'🐟'},
+    {name:'鎌倉雜貨店',city:'鎌倉',desc:'小町通り風格雜貨與陶器',tip:'獨立小店藏寶多',rating:4.3,icon:'🏺'},
+    {name:'橫濱中華街伴手禮',city:'橫濱',desc:'月餅、中式糕點、茶葉',tip:'散裝比盒裝划算',rating:4.4,icon:'🎁'}
+  ]
+};
+
+window.setCat=function(btn,cat){
+  curCat=cat;
+  document.querySelectorAll('.cat-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ai-result').innerHTML='';
+  renderPresets();
+};
+
+function renderPresets(){
+  const list=presets[curCat]||[];
+  document.getElementById('preset-list').innerHTML=
+    `<div class="sec-label" style="margin-bottom:10px">精選推薦・${curCat}</div>`+
+    list.map(p=>`
+      <div class="place-card">
+        <div class="place-thumb">${p.icon}</div>
+        <div class="place-info">
+          <h4>${p.name}</h4>
+          <div class="addr">📍 ${p.city}</div>
+          <div class="pdesc">${p.desc}</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="rating">★ ${p.rating}</span>
+            <span style="font-size:11px;color:#888">💡 ${p.tip}</span>
+          </div>
+        </div>
+      </div>`).join('');
+}
+
+window.doSearch=async function(){
+  const q=document.getElementById('q-input').value.trim();
+  if(!q)return;
+  const box=document.getElementById('ai-result');
+  box.innerHTML=`<div class="ai-result-box"><div class="ai-label">✨ AI 搜尋中</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:6px 0">
+      <div class="dot-pulse"><span></span><span></span><span></span></div>
+      <span style="font-size:13px;color:#6c3fc5">正在搜尋「${q}」的${curCat}…</span>
+    </div></div>`;
+  try{
+    const prompt=`你是專業日本旅遊嚮導。使用者搜尋：「${q}」，類別：${curCat}。
+推薦5個真實地點，以繁體中文回應，只輸出JSON陣列，格式：
+[{"name":"名稱","city":"城市","desc":"簡介20字內","tip":"小提示15字內","rating":4.5,"icon":"emoji"}]`;
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})
+    });
+    const data=await res.json();
+    const raw=data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+    const places=JSON.parse(raw);
+    box.innerHTML=`<div class="ai-result-box">
+      <div class="ai-label">✨ AI 推薦結果 <span class="ai-badge">AI</span></div>
+      ${places.map(p=>`
+        <div class="place-card" style="border:none;padding:10px 0;border-bottom:.5px solid #e8e0ff;border-radius:0;margin:0">
+          <div class="place-thumb" style="background:#f0ebff;width:50px;height:50px;font-size:22px">${p.icon}</div>
+          <div class="place-info">
+            <h4>${p.name}</h4>
+            <div class="addr">📍 ${p.city}</div>
+            <div class="pdesc">${p.desc}</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span class="rating">★ ${p.rating}</span>
+              <span style="font-size:11px;color:#6c3fc5">💡 ${p.tip}</span>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }catch(e){
+    box.innerHTML=`<div class="ai-result-box"><div class="ai-label">搜尋失敗，請稍後再試</div></div>`;
+  }
+};
+
+// --- BUDGET ---
+function renderBudgetTabs(){
+  const tabs=[{v:'all',l:'全部'},...DAYS.map((d,i)=>({v:i+1,l:`${d.l} ${d.d}`}))];
+  document.getElementById('budget-day-tabs').innerHTML=tabs.map(t=>
+    `<button class="day-btn${t.v===curBudgetDay?' active':''}" onclick="window.setBDay('${t.v}')">${t.l}</button>`
+  ).join('');
+}
+window.setBDay=function(v){curBudgetDay=v==='all'?'all':parseInt(v);renderBudgetTabs();renderExpenses();};
+
+function renderExpenses(){
+  const list=curBudgetDay==='all'?expenses:expenses.filter(e=>e.day===curBudgetDay);
+  const total=expenses.reduce((s,e)=>s+e.amt,0);
+  document.getElementById('prog-fill').style.width=Math.min(100,Math.round(total/BUDGET*100))+'%';
+  document.getElementById('spent-total').textContent='¥'+total.toLocaleString();
+  document.getElementById('exp-list').innerHTML=list.length?list.map(e=>`
+    <div class="exp-item">
+      <div class="exp-left">
+        <div class="exp-icon">${ICONS[e.cat]||'📦'}</div>
+        <div><div class="exp-name">${e.name}</div><div class="exp-meta">${e.cat}・第${e.day}天</div></div>
+      </div>
+      <div class="exp-right">
+        <div class="exp-amt">¥${e.amt.toLocaleString()}</div>
+        <button class="exp-del" onclick="window.delExp('${e.id}')">✕</button>
+      </div>
+    </div>`).join(''):'<div class="empty">尚無花費記錄<br>點下方按鈕新增</div>';
+}
+
+window.delExp=async function(id){
+  if(!confirm('確定刪除這筆花費？'))return;
+  await deleteDoc(doc(db,'expenses',id));
+  toast('花費已刪除');
+};
+
+onSnapshot(query(collection(db,'expenses'),orderBy('ts')), snap=>{
+  expenses=[];
+  snap.forEach(d=>expenses.push({...d.data(),id:d.id}));
+  renderExpenses();
+});
+
+window.openExpModal=function(){
+  document.getElementById('e-name').value='';
+  document.getElementById('e-amt').value='';
+  document.getElementById('exp-modal').classList.add('open');
+};
+window.saveExp=async function(){
+  const name=document.getElementById('e-name').value.trim();
+  const amt=parseInt(document.getElementById('e-amt').value)||0;
+  if(!name||!amt)return;
+  setSyncDot('syncing');
+  await addDoc(collection(db,'expenses'),{
+    name, amt, cat:document.getElementById('e-cat').value,
+    day:parseInt(document.getElementById('e-day').value), ts:serverTimestamp()
+  });
+  closeModal('exp-modal');
+  toast('花費已儲存 ✓');
+  setSyncDot('on');
+};
+
+// modals
+window.closeModal=function(id){document.getElementById(id).classList.remove('open');};
+document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+
+// countdown
+const depart=new Date('2025-06-17');
+const today=new Date();today.setHours(0,0,0,0);
+const diff=Math.ceil((depart-today)/(1000*60*60*24));
+document.getElementById('countdown').textContent=diff>0?diff:'出發了！🎉';
+
+// init
+renderDayTabs();
+renderPresets();
+renderBudgetTabs();
+</script>
+</body>
+</html>
