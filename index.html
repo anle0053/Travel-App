@@ -9,14 +9,13 @@
 <title>旅遊助手</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--c:#2e7d9f;--ca:#e8f4fd;--cb:#185fa5;--warn:#ba7517;--warnbg:#fff8f0;--warnborder:#fac775;--red:#d94f3d;--green:#2e7d4f;--border:#eee;--sub:#888;--r:13px}
+:root{--c:#2e7d9f;--ca:#e8f4fd;--cb:#185fa5;--warn:#ba7517;--warnbg:#fff8f0;--warnborder:#fac775;--red:#d94f3d;--border:#eee;--sub:#888;--r:13px}
 html,body{height:100%;overflow:hidden;position:fixed;width:100%}
 body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;color:#222;font-size:15px;background:#f5f5f0}
 .app{display:flex;flex-direction:column;height:100%;height:100dvh;max-width:430px;margin:0 auto;background:#fff}
 .header{background:var(--c);color:#fff;padding:52px 16px 14px;flex-shrink:0;display:flex;justify-content:space-between;align-items:flex-end}
 .header-left h1{font-size:17px;font-weight:600}
 .header-left .sub{font-size:12px;opacity:.8;margin-top:2px}
-.header-right{display:flex;align-items:center;gap:8px}
 .sync-dot{width:8px;height:8px;border-radius:50%;background:#4caf50}
 .sync-dot.off{background:#ff5252}
 .sync-dot.syncing{background:#ffeb3b;animation:blink .8s infinite}
@@ -29,13 +28,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .nav-btn.active{color:var(--c)}
 .nav-icon{font-size:22px;line-height:1}
 
-/* TRIP SELECTOR */
 .trip-selector{background:#f0f8ff;border:.5px solid #b5d4f4;border-radius:var(--r);padding:12px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
-.trip-selector .ts-left .ts-name{font-size:15px;font-weight:600;color:var(--cb)}
-.trip-selector .ts-left .ts-date{font-size:12px;color:var(--sub);margin-top:2px}
-.trip-selector .ts-arrow{font-size:18px;color:var(--c)}
+.trip-selector .ts-name{font-size:15px;font-weight:600;color:var(--cb)}
+.trip-selector .ts-date{font-size:12px;color:var(--sub);margin-top:2px}
 
-/* TRIP LIST SCREEN */
 .screen{position:fixed;inset:0;background:#f5f5f0;z-index:400;display:none;flex-direction:column;max-width:430px;margin:0 auto}
 .screen.open{display:flex}
 .screen-header{background:var(--c);color:#fff;padding:52px 16px 14px;display:flex;justify-content:space-between;align-items:flex-end;flex-shrink:0}
@@ -45,14 +41,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 
 .trip-item{background:#fff;border:.5px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
 .trip-item.active-trip{border-color:var(--c);background:#f0f8ff}
-.trip-item-left .ti-name{font-size:15px;font-weight:600}
-.trip-item-left .ti-meta{font-size:12px;color:var(--sub);margin-top:3px}
-.trip-item-right{display:flex;gap:8px;align-items:center}
+.ti-name{font-size:15px;font-weight:600}
+.ti-meta{font-size:12px;color:var(--sub);margin-top:3px}
 .icon-btn{background:none;border:none;font-size:18px;cursor:pointer;padding:4px;color:var(--sub)}
-.icon-btn:hover{color:var(--red)}
 .active-badge{background:var(--c);color:#fff;border-radius:20px;padding:3px 10px;font-size:11px}
 
-/* CARDS */
 .trip-card{background:linear-gradient(135deg,var(--c),#4aa8c8);color:#fff;border-radius:var(--r);padding:20px;margin-bottom:14px}
 .trip-card h2{font-size:19px;font-weight:600;margin-bottom:4px}
 .trip-card .dates{font-size:12px;opacity:.85;margin-bottom:14px}
@@ -68,13 +61,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .chip{background:var(--ca);color:var(--cb);border:.5px solid #b5d4f4;border-radius:20px;padding:6px 13px;font-size:13px}
 .members-row{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
 .member{background:var(--ca);color:var(--cb);border:.5px solid #b5d4f4;border-radius:20px;padding:7px 14px;font-size:13px;font-weight:600}
-.weather-row{display:flex;gap:8px}
-.wx-card{background:#f0f8ff;border-radius:10px;padding:11px;flex:1;text-align:center}
-.wx-card .wc{font-size:11px;color:#555;margin-bottom:3px}
-.wx-card .wt{font-size:17px;font-weight:600;color:var(--cb)}
-.wx-card .wd{font-size:10px;color:var(--sub)}
 
-/* ITINERARY */
 .day-scroll{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
 .day-scroll::-webkit-scrollbar{display:none}
 .day-btn{padding:7px 12px;border-radius:20px;border:.5px solid #ddd;background:#fff;font-size:11px;cursor:pointer;white-space:nowrap;color:#555;line-height:1.4;text-align:center;flex-shrink:0}
@@ -85,42 +72,48 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .tl{width:2px;background:#eee;position:relative;flex-shrink:0}
 .dot{width:10px;height:10px;background:var(--c);border-radius:50%;position:absolute;top:5px;left:-4px}
 .itin-card{flex:1;background:#fff;border:.5px solid var(--border);border-radius:12px;padding:11px;position:relative}
-.itin-card h4{font-size:14px;font-weight:600;margin-bottom:4px;padding-right:52px}
+.itin-card h4{font-size:14px;font-weight:600;margin-bottom:4px;padding-right:56px}
 .itin-card .meta{font-size:11px;color:var(--sub);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .card-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px}
-.card-btn{background:none;border:none;font-size:15px;cursor:pointer;padding:3px;color:#ccc;line-height:1}
-.card-btn:hover{color:var(--c)}
-.card-btn.del:hover{color:var(--red)}
+.card-btn{background:none;border:none;font-size:15px;cursor:pointer;padding:4px;color:#ccc;line-height:1}
+.card-btn:active{color:var(--c)}
+.card-btn.del:active{color:var(--red)}
 .tag{border-radius:6px;padding:2px 7px;font-size:11px}
 .tag-spot{background:var(--ca);color:var(--cb)}
 .tag-food{background:#fff8f0;color:#ba7517}
 .tag-shop{background:#fef3f0;color:var(--red)}
 .tag-move{background:#e8f5ee;color:#0f6e56}
 .tag-stay{background:#f0f0ff;color:#5050c8}
-.transport-hint{background:#e8f5ee;border-radius:9px;padding:8px 12px;margin:6px 0 6px 52px;font-size:12px;color:#0f6e56;display:flex;align-items:center;justify-content:space-between}
-.transport-text{display:flex;align-items:center;gap:5px;flex:1}
-.trans-edit{background:none;border:none;font-size:13px;cursor:pointer;color:#0f6e56;opacity:.6;padding:2px 4px}
-.add-btn{width:100%;margin-top:8px;padding:12px;border:.5px dashed #ccc;background:none;border-radius:12px;color:#aaa;font-size:13px;cursor:pointer}
-.add-btn:hover{border-color:var(--c);color:var(--c)}
+.transport-hint{background:#e8f5ee;border-radius:9px;padding:8px 12px;margin:6px 0 6px 52px;font-size:12px;color:#0f6e56}
+.add-btn{width:100%;margin-top:8px;padding:13px;border:.5px dashed #ccc;background:none;border-radius:12px;color:#aaa;font-size:13px;cursor:pointer}
 .day-actions{display:flex;gap:8px;margin-bottom:12px}
 .day-action-btn{flex:1;padding:10px;border:.5px solid #ddd;background:#fff;border-radius:10px;font-size:12px;cursor:pointer;color:#555;text-align:center}
-.day-action-btn:hover{border-color:var(--c);color:var(--c)}
-.day-action-btn.danger:hover{border-color:var(--red);color:var(--red)}
 
 /* EXPLORE */
+.explore-hint{background:#f0f8ff;border:.5px solid #b5d4f4;border-radius:12px;padding:14px;margin-bottom:14px}
+.explore-hint h3{font-size:14px;font-weight:600;color:var(--cb);margin-bottom:6px}
+.explore-hint p{font-size:12px;color:#555;line-height:1.6}
+.explore-hint .hint-steps{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.hint-step{display:flex;align-items:flex-start;gap:8px;font-size:12px;color:#444}
+.hint-num{background:var(--c);color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px}
 .search-wrap{margin-bottom:12px}
 .search-box{display:flex;align-items:center;gap:8px;background:#f0f0eb;border-radius:12px;padding:11px 13px}
 .search-box input{border:none;background:none;flex:1;font-size:15px;outline:none;color:#222}
 .search-btn{background:var(--c);color:#fff;border:none;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.search-btn:disabled{opacity:.5;cursor:not-allowed}
 .cat-tabs{display:flex;gap:6px;margin-bottom:12px}
 .cat-tab{padding:7px 16px;border-radius:20px;border:.5px solid #ddd;background:#fff;font-size:13px;cursor:pointer;color:#555}
 .cat-tab.active{background:var(--c);color:#fff;border-color:var(--c)}
 .place-card{display:flex;gap:11px;background:#fff;border:.5px solid var(--border);border-radius:12px;padding:12px;margin-bottom:9px}
 .place-thumb{width:56px;height:56px;border-radius:10px;background:#eee;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:24px}
+.place-info{flex:1}
 .place-info h4{font-size:14px;font-weight:600;margin-bottom:3px}
 .place-info .addr{font-size:11px;color:var(--sub);margin-bottom:3px}
-.place-info .pdesc{font-size:12px;color:#444;margin-bottom:4px}
+.place-info .pdesc{font-size:12px;color:#444;margin-bottom:5px}
+.place-info .pfoot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
 .rating{font-size:12px;color:#ba7517}
+.add-to-btn{background:var(--c);color:#fff;border:none;border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-weight:500}
+.add-to-btn:disabled{opacity:.5;cursor:not-allowed}
 .ai-result-box{background:#f8f4ff;border:.5px solid #c5a9f5;border-radius:12px;padding:14px;margin-bottom:12px}
 .ai-label{font-size:11px;color:#6c3fc5;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:5px}
 .ai-badge{background:linear-gradient(90deg,#6c3fc5,var(--c));color:#fff;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:600}
@@ -129,52 +122,56 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
 .dot-pulse span:nth-child(2){animation-delay:.2s}
 .dot-pulse span:nth-child(3){animation-delay:.4s}
 @keyframes pulse{0%,80%,100%{opacity:.3;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
-.add-to-itin{background:var(--ca);color:var(--cb);border:.5px solid #b5d4f4;border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;border:none;margin-top:4px}
 
 /* BUDGET */
 .budget-card{background:var(--warnbg);border:.5px solid var(--warnborder);border-radius:var(--r);padding:16px;margin-bottom:14px}
 .budget-card h3{font-size:13px;color:#633806;margin-bottom:4px;font-weight:600}
 .budget-total{font-size:28px;font-weight:600;color:#633806;margin-bottom:2px}
-.budget-sub{font-size:12px;color:#ba7517;margin-bottom:12px}
-.budget-by-cat{display:flex;gap:8px;flex-wrap:wrap}
-.cat-pill{background:#fff;border-radius:20px;padding:5px 12px;font-size:12px;color:#633806;border:.5px solid var(--warnborder)}
-.exp-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#fff;border:.5px solid var(--border);border-radius:10px;margin-bottom:8px}
+.budget-sub{font-size:12px;color:#ba7517;margin-bottom:10px}
+.budget-by-cat{display:flex;gap:6px;flex-wrap:wrap}
+.cat-pill{background:#fff;border-radius:20px;padding:5px 11px;font-size:12px;color:#633806;border:.5px solid var(--warnborder)}
+.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.filter-btn{padding:6px 12px;border-radius:20px;border:.5px solid #ddd;background:#fff;font-size:12px;cursor:pointer;white-space:nowrap;color:#555;flex-shrink:0}
+.filter-btn.active{background:var(--warn);color:#fff;border-color:var(--warn)}
+.exp-item{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#fff;border:.5px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer}
+.exp-item:active{background:#f9f9f9}
 .exp-left{display:flex;align-items:center;gap:10px}
 .exp-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;background:#fff8f0}
 .exp-name{font-size:14px;font-weight:500}
 .exp-meta{font-size:11px;color:var(--sub)}
 .exp-right{display:flex;align-items:center;gap:8px}
 .exp-amt{font-size:15px;font-weight:600;color:#633806}
-.exp-del{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer}
-.exp-del:hover{color:var(--red)}
+.exp-del{background:none;border:none;color:#ccc;font-size:16px;cursor:pointer;padding:4px}
 .add-exp-btn{width:100%;padding:14px;background:var(--c);color:#fff;border:none;border-radius:12px;font-size:14px;cursor:pointer;font-weight:600}
 .empty{text-align:center;color:#bbb;padding:36px 0;font-size:13px;line-height:2}
-.filter-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
-.filter-row::-webkit-scrollbar{display:none}
-.filter-btn{padding:6px 12px;border-radius:20px;border:.5px solid #ddd;background:#fff;font-size:12px;cursor:pointer;white-space:nowrap;color:#555;flex-shrink:0}
-.filter-btn.active{background:var(--warn);color:#fff;border-color:var(--warn)}
 
-/* TOAST */
+/* CURRENCY BADGE */
+.currency-badge{display:inline-flex;align-items:center;gap:6px;background:var(--ca);border:.5px solid #b5d4f4;border-radius:20px;padding:5px 12px;font-size:12px;color:var(--cb);margin-bottom:14px}
+
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 
-/* MODALS */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:flex-end;justify-content:center}
 .overlay.open{display:flex}
-.modal{background:#fff;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:430px;max-width:100%;max-height:85dvh;overflow-y:auto}
+.modal{background:#fff;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));width:430px;max-width:100%;max-height:88dvh;overflow-y:auto}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
 .frow{margin-bottom:11px}
 .frow label{font-size:12px;color:var(--sub);display:block;margin-bottom:4px}
-.frow input,.frow select,.frow textarea{width:100%;padding:10px 12px;border:.5px solid #ddd;border-radius:9px;font-size:14px;background:#fff;color:#222;font-family:inherit}
+.frow input,.frow select,.frow textarea{width:100%;padding:10px 12px;border:.5px solid #ddd;border-radius:9px;font-size:14px;background:#fff;color:#222;font-family:inherit;-webkit-appearance:none}
 .frow textarea{resize:none;height:68px}
 .modal-btns{display:flex;gap:8px;margin-top:16px}
 .btn-cancel{flex:1;padding:13px;border:.5px solid #ddd;background:#fff;border-radius:11px;font-size:14px;cursor:pointer;color:#555}
 .btn-save{flex:1;padding:13px;border:none;background:var(--c);color:#fff;border-radius:11px;font-size:14px;cursor:pointer;font-weight:600}
-.btn-danger{flex:1;padding:13px;border:none;background:var(--red);color:#fff;border-radius:11px;font-size:14px;cursor:pointer;font-weight:600}
-.divider{height:.5px;background:#eee;margin:12px 0}
+.btn-save:disabled{opacity:.5;cursor:not-allowed}
+.btn-danger{padding:13px;border:none;background:var(--red);color:#fff;border-radius:11px;font-size:14px;cursor:pointer;font-weight:600;width:100%;margin-top:8px}
 .full-btn{width:100%;padding:13px;border:none;background:var(--c);color:#fff;border-radius:11px;font-size:14px;cursor:pointer;font-weight:600;margin-bottom:8px}
-.full-btn.outline{background:#fff;color:var(--c);border:.5px solid var(--c)}
-.full-btn.danger{background:var(--red)}
+
+/* day picker in explore */
+.day-picker-row{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+.day-picker-row::-webkit-scrollbar{display:none}
+.day-pick-btn{padding:6px 12px;border-radius:20px;border:.5px solid #ddd;background:#fff;font-size:12px;cursor:pointer;white-space:nowrap;color:#555;flex-shrink:0}
+.day-pick-btn.active{background:var(--c);color:#fff;border-color:var(--c)}
 </style>
 </head>
 <body>
@@ -184,43 +181,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
       <h1>🗾 旅遊助手</h1>
       <div class="sub" id="header-sub">載入中…</div>
     </div>
-    <div class="header-right">
-      <div class="sync-dot off" id="sync-dot"></div>
-    </div>
+    <div class="sync-dot off" id="sync-dot"></div>
   </div>
-
   <div class="pages">
-    <!-- 首頁 -->
     <div class="page active" id="page-home">
       <div class="trip-selector" onclick="openTripList()">
-        <div class="ts-left">
-          <div class="ts-name" id="ts-name">選擇行程</div>
-          <div class="ts-date" id="ts-date">點此切換旅行</div>
-        </div>
-        <div class="ts-arrow">⌄</div>
+        <div><div class="ts-name" id="ts-name">選擇行程</div><div class="ts-date" id="ts-date">點此切換旅行</div></div>
+        <div style="font-size:18px;color:var(--c)">⌄</div>
       </div>
       <div id="home-content"><div class="empty">尚未選擇行程</div></div>
     </div>
 
-    <!-- 行程 -->
     <div class="page" id="page-itinerary">
       <div class="day-scroll" id="day-tabs"></div>
       <div id="stay-badge"></div>
       <div class="day-actions">
         <button class="day-action-btn" onclick="openAddDay()">＋ 新增一天</button>
-        <button class="day-action-btn danger" onclick="deleteCurrentDay()">刪除此天</button>
+        <button class="day-action-btn" onclick="deleteCurrentDay()" style="color:var(--red);border-color:#fcc">刪除此天</button>
       </div>
       <div id="itin-body"></div>
       <button class="add-btn" onclick="openSpotModal()">＋ 新增景點</button>
     </div>
 
-    <!-- 探索 -->
     <div class="page" id="page-explore">
-      <div class="search-wrap">
-        <div class="search-box">
-          <span style="color:#aaa;font-size:17px">🔍</span>
-          <input id="q-input" type="text" placeholder="搜尋附近景點、餐廳…" onkeydown="if(event.key==='Enter')doSearch()">
-          <button class="search-btn" onclick="doSearch()">搜尋</button>
+      <div class="explore-hint">
+        <h3>✨ 探索景點與餐廳</h3>
+        <div class="hint-steps">
+          <div class="hint-step"><div class="hint-num">1</div><span>選擇類別（景點／餐廳／購物）</span></div>
+          <div class="hint-step"><div class="hint-num">2</div><span>輸入地點或關鍵字，例如「箱根 溫泉」、「鎌倉 甜點」</span></div>
+          <div class="hint-step"><div class="hint-num">3</div><span>點「＋ 加入行程」把搜尋結果直接加到當天行程</span></div>
         </div>
       </div>
       <div class="cat-tabs">
@@ -228,24 +217,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
         <button class="cat-tab" onclick="setCat(this,'餐廳')">餐廳</button>
         <button class="cat-tab" onclick="setCat(this,'購物')">購物</button>
       </div>
+      <div class="search-wrap">
+        <div class="search-box">
+          <span style="color:#aaa;font-size:17px">🔍</span>
+          <input id="q-input" type="text" placeholder="例：箱根 溫泉、鎌倉 甜點…" onkeydown="if(event.key==='Enter')doSearch()">
+          <button class="search-btn" id="search-btn" onclick="doSearch()">搜尋</button>
+        </div>
+      </div>
       <div id="ai-result"></div>
       <div id="preset-list"></div>
     </div>
 
-    <!-- 記帳 -->
     <div class="page" id="page-budget">
+      <div id="currency-display"></div>
       <div class="budget-card">
         <h3>總消費</h3>
-        <div class="budget-total" id="budget-total">¥0</div>
+        <div class="budget-total" id="budget-total">—</div>
         <div class="budget-sub" id="budget-sub">共 0 筆記錄</div>
         <div class="budget-by-cat" id="budget-by-cat"></div>
       </div>
       <div class="filter-row" id="budget-filter"></div>
       <div id="exp-list"></div>
-      <button class="add-exp-btn" onclick="openExpModal()">＋ 新增消費</button>
+      <button class="add-exp-btn" onclick="openExpModal(null)">＋ 新增消費</button>
     </div>
   </div>
-
   <nav class="nav">
     <button class="nav-btn active" onclick="showPage('home',this)"><span class="nav-icon">🏠</span>首頁</button>
     <button class="nav-btn" onclick="showPage('itinerary',this)"><span class="nav-icon">📅</span>行程</button>
@@ -254,21 +249,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
   </nav>
 </div>
 
-<!-- 行程列表 Screen -->
+<!-- Trip List Screen -->
 <div class="screen" id="trip-list-screen">
   <div class="screen-header">
     <h2>我的旅行</h2>
-    <button onclick="closeTripList()" style="background:none;border:none;color:#fff;font-size:15px;cursor:pointer">關閉</button>
+    <button onclick="closeTripList()" style="background:none;border:none;color:#fff;font-size:15px;cursor:pointer;padding:4px 8px">關閉</button>
   </div>
   <div class="screen-body" id="trip-list-body"></div>
-  <div class="screen-footer">
-    <button class="full-btn" onclick="openNewTripModal()">＋ 新增旅行</button>
-  </div>
+  <div class="screen-footer"><button class="full-btn" onclick="openNewTripModal()">＋ 新增旅行</button></div>
 </div>
 
 <div class="toast" id="toast"></div>
 
-<!-- 新增/編輯旅行 -->
+<!-- Trip Modal -->
 <div class="overlay" id="trip-modal">
   <div class="modal">
     <h3 id="trip-modal-title">新增旅行</h3>
@@ -276,16 +269,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
     <div class="frow"><label>副標題</label><input id="tm-sub" placeholder="例：東京・橫濱・箱根"></div>
     <div class="frow"><label>出發日期</label><input id="tm-start" type="date"></div>
     <div class="frow"><label>回程日期</label><input id="tm-end" type="date"></div>
-    <div class="frow"><label>成員（用逗號分隔）</label><input id="tm-members" placeholder="例：Dan,Co,魚,月"></div>
-    <div class="frow"><label>城市（用逗號分隔）</label><input id="tm-cities" placeholder="例：東京,橫濱,箱根"></div>
+    <div class="frow"><label>成員（逗號分隔）</label><input id="tm-members" placeholder="例：Dan,Co,魚,月"></div>
+    <div class="frow"><label>城市（逗號分隔）</label><input id="tm-cities" placeholder="例：東京,橫濱,箱根"></div>
+    <div class="frow"><label>記帳貨幣</label>
+      <select id="tm-currency">
+        <option value="¥ 日圓">¥ 日圓</option>
+        <option value="$ 美元">$ 美元</option>
+        <option value="€ 歐元">€ 歐元</option>
+        <option value="£ 英鎊">£ 英鎊</option>
+        <option value="₩ 韓元">₩ 韓元</option>
+        <option value="NT$ 台幣">NT$ 台幣</option>
+        <option value="HK$ 港幣">HK$ 港幣</option>
+        <option value="฿ 泰銖">฿ 泰銖</option>
+      </select>
+    </div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('trip-modal')">取消</button>
-      <button class="btn-save" onclick="saveTrip()">儲存</button>
+      <button class="btn-cancel" id="trip-cancel-btn">取消</button>
+      <button class="btn-save" id="trip-save-btn" onclick="saveTrip()">儲存</button>
     </div>
   </div>
 </div>
 
-<!-- 新增/編輯景點 -->
+<!-- Spot Modal -->
 <div class="overlay" id="spot-modal">
   <div class="modal">
     <h3 id="spot-modal-title">新增景點</h3>
@@ -295,48 +300,73 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Helvetica Neue',sans-serif;co
       <select id="s-type"><option>景點</option><option>餐廳</option><option>購物</option><option>交通</option><option>住宿</option></select>
     </div>
     <div class="frow"><label>備註</label><textarea id="s-note" placeholder="選填"></textarea></div>
-    <div class="frow"><label>到下一站的交通方式</label><input id="s-trans" placeholder="例：JR東海道線 20分鐘（選填）"></div>
+    <div class="frow"><label>到下一站交通</label><input id="s-trans" placeholder="例：JR東海道線 20分鐘（選填）"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('spot-modal')">取消</button>
-      <button class="btn-save" onclick="saveSpot()">儲存</button>
+      <button class="btn-cancel" id="spot-cancel-btn">取消</button>
+      <button class="btn-save" id="spot-save-btn" onclick="saveSpot()">儲存</button>
     </div>
   </div>
 </div>
 
-<!-- 新增一天 -->
+<!-- Add Day Modal -->
 <div class="overlay" id="add-day-modal">
   <div class="modal">
     <h3>新增一天</h3>
-    <div class="frow"><label>城市/地點</label><input id="ad-city" placeholder="例：奈良"></div>
+    <div class="frow"><label>城市／地點</label><input id="ad-city" placeholder="例：奈良"></div>
     <div class="frow"><label>住宿地點</label><input id="ad-stay" placeholder="例：大阪站附近"></div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('add-day-modal')">取消</button>
-      <button class="btn-save" onclick="saveNewDay()">新增</button>
+      <button class="btn-cancel" id="addday-cancel-btn">取消</button>
+      <button class="btn-save" id="addday-save-btn" onclick="saveNewDay()">新增</button>
     </div>
   </div>
 </div>
 
-<!-- 新增消費 -->
+<!-- Expense Modal -->
 <div class="overlay" id="exp-modal">
   <div class="modal">
-    <h3>新增消費</h3>
+    <h3 id="exp-modal-title">新增消費</h3>
     <div class="frow"><label>項目</label><input id="e-name" placeholder="例：午餐"></div>
-    <div class="frow"><label>金額（日幣 ¥）</label><input id="e-amt" type="number" placeholder="0"></div>
+    <div class="frow"><label>金額</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="flex:1"><input id="e-amt" type="number" placeholder="0" style="width:100%;padding:10px 12px;border:.5px solid #ddd;border-radius:9px;font-size:14px"></div>
+        <div style="font-size:13px;color:var(--sub);white-space:nowrap" id="e-currency-label">¥ 日圓</div>
+      </div>
+    </div>
     <div class="frow"><label>類別</label>
       <select id="e-cat"><option>餐飲</option><option>交通</option><option>景點門票</option><option>購物</option><option>住宿</option><option>其他</option></select>
     </div>
     <div class="frow"><label>日期</label><select id="e-day"></select></div>
     <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeModal('exp-modal')">取消</button>
-      <button class="btn-save" onclick="saveExp()">儲存</button>
+      <button class="btn-cancel" id="exp-cancel-btn">取消</button>
+      <button class="btn-save" id="exp-save-btn" onclick="saveExp()">儲存</button>
+    </div>
+    <button class="btn-danger" id="exp-delete-btn" style="display:none" onclick="deleteExpFromModal()">刪除這筆消費</button>
+  </div>
+</div>
+
+<!-- Add to Itinerary Modal (from explore) -->
+<div class="overlay" id="add-itin-modal">
+  <div class="modal">
+    <h3>加入行程</h3>
+    <div style="background:#f5f5f0;border-radius:10px;padding:12px;margin-bottom:14px">
+      <div style="font-weight:600;font-size:14px" id="aim-name"></div>
+      <div style="font-size:12px;color:var(--sub);margin-top:3px" id="aim-city"></div>
+    </div>
+    <div class="frow"><label>加入哪一天</label>
+      <div class="day-picker-row" id="aim-day-picker"></div>
+    </div>
+    <div class="frow"><label>時間</label><input id="aim-time" type="time" value="10:00"></div>
+    <div class="frow"><label>備註（選填）</label><input id="aim-note" placeholder="選填"></div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="aim-cancel-btn">取消</button>
+      <button class="btn-save" id="aim-save-btn" onclick="saveAddToItin()">加入行程</button>
     </div>
   </div>
 </div>
 
-<!-- Firebase -->
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,where,serverTimestamp,getDocs}
+import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp}
 from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const fb=initializeApp({apiKey:"AIzaSyDnY5wcb0QXOPXzAvRmrqltESS_U5afCS8",authDomain:"travel-app-38ad8.firebaseapp.com",projectId:"travel-app-38ad8",storageBucket:"travel-app-38ad8.firebasestorage.app",messagingSenderId:"306708070000",appId:"1:306708070000:web:716f2db183d2e432357eb5"});
@@ -347,14 +377,43 @@ const TAG={景點:'tag-spot',餐廳:'tag-food',購物:'tag-shop',交通:'tag-mov
 
 let trips=[],curTripId=null,curDay=0,curBudgetDay='all',curCat='景點';
 let spots=[],expenses=[],days=[];
-let editSpotId=null;
+let editSpotId=null,editExpId=null,editTripId=null;
 let spotsUnsub=null,expUnsub=null,daysUnsub=null;
+let aimPlace=null,aimDayIdx=0;
+
+// ── LOCK ── prevent double-taps
+let saving=false;
+function withLock(btn,fn){
+  if(saving)return;
+  saving=true;
+  if(btn){btn.disabled=true;btn.textContent=btn.textContent.replace('儲存','儲存中…').replace('新增','新增中…');}
+  Promise.resolve(fn()).finally(()=>{
+    saving=false;
+    if(btn){btn.disabled=false;btn.textContent=btn.textContent.replace('儲存中…','儲存').replace('新增中…','新增');}
+  });
+}
 
 // ── UTILS ──
-function setSyncDot(s){const d=document.getElementById('sync-dot');d.className='sync-dot '+(s==='on'?'on':s==='syncing'?'syncing':'off');}
+function setSyncDot(s){document.getElementById('sync-dot').className='sync-dot '+(s==='on'?'on':s==='syncing'?'syncing':'off');}
 function toast(m){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
+
+// ── MODALS ──
+// All cancel buttons wired here — guaranteed to work
+function setupModal(overlayId,cancelBtnId){
+  const overlay=document.getElementById(overlayId);
+  const cancelBtn=document.getElementById(cancelBtnId);
+  if(cancelBtn) cancelBtn.addEventListener('click',()=>overlay.classList.remove('open'));
+  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open');});
+}
+setupModal('trip-modal','trip-cancel-btn');
+setupModal('spot-modal','spot-cancel-btn');
+setupModal('add-day-modal','addday-cancel-btn');
+setupModal('exp-modal','exp-cancel-btn');
+setupModal('add-itin-modal','aim-cancel-btn');
+
+function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-document.querySelectorAll('.overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+window.closeModal=closeModal;
 
 window.showPage=function(id,btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
@@ -368,24 +427,21 @@ onSnapshot(query(collection(db,'trips'),orderBy('ts')),snap=>{
   trips=[];snap.forEach(d=>trips.push({...d.data(),id:d.id}));
   setSyncDot('on');
   renderTripList();
-  if(!curTripId&&trips.length>0) selectTrip(trips[0].id);
-  else if(curTripId) renderHome();
-});
+  if(!curTripId&&trips.length>0)selectTrip(trips[0].id);
+  else if(curTripId)renderHome();
+},()=>setSyncDot('off'));
 
 function renderTripList(){
-  const cur=trips.find(t=>t.id===curTripId);
   document.getElementById('trip-list-body').innerHTML=trips.length?trips.map(t=>`
     <div class="trip-item${t.id===curTripId?' active-trip':''}" onclick="selectTrip('${t.id}')">
-      <div class="trip-item-left">
-        <div class="ti-name">${t.name}</div>
-        <div class="ti-meta">${t.startDate||''} ${t.endDate?'→ '+t.endDate:''} · ${(t.members||[]).join('、')}</div>
-      </div>
-      <div class="trip-item-right">
+      <div><div class="ti-name">${t.name}</div>
+      <div class="ti-meta">${t.startDate||''}${t.endDate?' → '+t.endDate:''} · ${(t.members||[]).join('、')} · ${t.currency||'¥ 日圓'}</div></div>
+      <div style="display:flex;gap:6px;align-items:center">
         ${t.id===curTripId?'<span class="active-badge">使用中</span>':''}
         <button class="icon-btn" onclick="event.stopPropagation();openEditTrip('${t.id}')">✏️</button>
-        <button class="icon-btn del" onclick="event.stopPropagation();deleteTrip('${t.id}')">🗑</button>
+        <button class="icon-btn" onclick="event.stopPropagation();deleteTrip('${t.id}')">🗑</button>
       </div>
-    </div>`).join(''):'<div class="empty">尚無旅行<br>點下方「新增旅行」開始</div>';
+    </div>`).join(''):'<div class="empty">尚無旅行<br>點下方新增</div>';
 }
 
 window.selectTrip=function(id){
@@ -399,26 +455,22 @@ window.selectTrip=function(id){
   closeTripList();
   subscribeTrip();
   renderHome();
-  renderBudgetDayFilter();
 };
 
-function subscribeTrip(){
-  if(spotsUnsub)spotsUnsub();
-  if(expUnsub)expUnsub();
-  if(daysUnsub)daysUnsub();
-  if(!curTripId)return;
+function getCurTrip(){return trips.find(x=>x.id===curTripId);}
+function getCurrency(){const t=getCurTrip();return t?t.currency||'¥ 日圓':'¥ 日圓';}
 
+function subscribeTrip(){
+  if(spotsUnsub)spotsUnsub();if(expUnsub)expUnsub();if(daysUnsub)daysUnsub();
+  if(!curTripId)return;
   daysUnsub=onSnapshot(query(collection(db,'trips',curTripId,'days'),orderBy('order')),snap=>{
     days=[];snap.forEach(d=>days.push({...d.data(),id:d.id}));
-    renderDayTabs();renderItinerary();
-    renderBudgetDayFilter();
+    renderDayTabs();renderItinerary();renderBudgetDayFilter();
   });
-
   spotsUnsub=onSnapshot(query(collection(db,'trips',curTripId,'spots'),orderBy('ts')),snap=>{
     spots=[];snap.forEach(d=>spots.push({...d.data(),id:d.id}));
     renderItinerary();
   });
-
   expUnsub=onSnapshot(query(collection(db,'trips',curTripId,'expenses'),orderBy('ts')),snap=>{
     expenses=[];snap.forEach(d=>expenses.push({...d.data(),id:d.id}));
     renderExpenses();
@@ -427,44 +479,40 @@ function subscribeTrip(){
 
 // ── HOME ──
 function renderHome(){
-  const t=trips.find(x=>x.id===curTripId);
+  const t=getCurTrip();
   if(!t){document.getElementById('home-content').innerHTML='<div class="empty">請選擇行程</div>';return;}
   const start=t.startDate?new Date(t.startDate):null;
   const end=t.endDate?new Date(t.endDate):null;
-  const diffDays=start&&end?Math.round((end-start)/(86400000))+1:0;
+  const diffDays=start&&end?Math.round((end-start)/86400000)+1:0;
   const today=new Date();today.setHours(0,0,0,0);
-  const daysLeft=start?Math.ceil((start-today)/86400000):null;
-  const cities=(t.cities||[]);
-  const members=(t.members||[]);
+  const dl=start?Math.ceil((start-today)/86400000):null;
+  const cdText=dl===null?'—':dl>0?dl:dl===0?'今天出發！🎉':'旅行中 ✈️';
+  const cdLabel=dl>0?'距離出發還有幾天':dl===0||dl<0?'':' ';
   document.getElementById('home-content').innerHTML=`
-    <div class="trip-card">
-      <h2>${t.name}</h2>
+    <div class="trip-card"><h2>${t.name}</h2>
       <div class="dates">${t.startDate||''}${t.endDate?' ─ '+t.endDate:''}</div>
       <div class="trip-stats">
         <div class="stat"><div class="num">${diffDays||'?'}</div><div class="lbl">天數</div></div>
-        <div class="stat"><div class="num">${members.length||'?'}</div><div class="lbl">成員</div></div>
-        <div class="stat"><div class="num">${cities.length||'?'}</div><div class="lbl">城市</div></div>
+        <div class="stat"><div class="num">${(t.members||[]).length||'?'}</div><div class="lbl">成員</div></div>
+        <div class="stat"><div class="num">${(t.cities||[]).length||'?'}</div><div class="lbl">城市</div></div>
       </div>
     </div>
-    <div class="countdown">
-      <div class="days">${daysLeft===null?'—':daysLeft>0?daysLeft:daysLeft===0?'今天出發！🎉':'旅行中 ✈️'}</div>
-      <div class="lbl">${daysLeft>0?'距離出發還有幾天':daysLeft===0?'':daysLeft<0?'':'距離出發還有幾天'}</div>
-    </div>
-    ${members.length?`<div class="sec-label">旅遊成員</div>
-    <div class="members-row">${members.map(m=>`<div class="member">${m}</div>`).join('')}</div>`:''}
-    ${cities.length?`<div class="sec-label">旅遊地區</div>
-    <div class="chip-row">${cities.map(c=>`<div class="chip">${c}</div>`).join('')}</div>`:''}
+    <div class="countdown"><div class="days">${cdText}</div><div class="lbl">${cdLabel}</div></div>
+    ${(t.members||[]).length?`<div class="sec-label">旅遊成員</div><div class="members-row">${t.members.map(m=>`<div class="member">${m}</div>`).join('')}</div>`:''}
+    ${(t.cities||[]).length?`<div class="sec-label">旅遊地區</div><div class="chip-row">${t.cities.map(c=>`<div class="chip">${c}</div>`).join('')}</div>`:''}
+    <div class="sec-label">記帳貨幣</div>
+    <div class="currency-badge">💰 ${t.currency||'¥ 日圓'}</div>
     <button class="add-btn" style="margin-top:4px" onclick="openEditTrip('${t.id}')">✏️ 編輯旅行資料</button>`;
 }
 
 // ── TRIP MODAL ──
-let editTripId=null;
 window.openNewTripModal=function(){
   editTripId=null;
   document.getElementById('trip-modal-title').textContent='新增旅行';
   ['tm-name','tm-sub','tm-start','tm-end','tm-members','tm-cities'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('tm-currency').value='¥ 日圓';
   closeModal('trip-list-screen');
-  document.getElementById('trip-modal').classList.add('open');
+  openModal('trip-modal');
 };
 window.openEditTrip=function(id){
   editTripId=id;
@@ -476,59 +524,55 @@ window.openEditTrip=function(id){
   document.getElementById('tm-end').value=t.endDate||'';
   document.getElementById('tm-members').value=(t.members||[]).join(',');
   document.getElementById('tm-cities').value=(t.cities||[]).join(',');
-  document.getElementById('trip-modal').classList.add('open');
+  document.getElementById('tm-currency').value=t.currency||'¥ 日圓';
+  openModal('trip-modal');
 };
-window.saveTrip=async function(){
-  const name=document.getElementById('tm-name').value.trim();if(!name)return;
-  const data={
-    name,subtitle:document.getElementById('tm-sub').value.trim(),
-    startDate:document.getElementById('tm-start').value,
-    endDate:document.getElementById('tm-end').value,
-    members:document.getElementById('tm-members').value.split(',').map(s=>s.trim()).filter(Boolean),
-    cities:document.getElementById('tm-cities').value.split(',').map(s=>s.trim()).filter(Boolean),
-    ts:serverTimestamp()
-  };
-  setSyncDot('syncing');
-  if(editTripId) await updateDoc(doc(db,'trips',editTripId),data);
-  else await addDoc(collection(db,'trips'),data);
-  closeModal('trip-modal');toast('旅行資料已儲存 ✓');setSyncDot('on');
+window.saveTrip=function(){
+  withLock(document.getElementById('trip-save-btn'),async()=>{
+    const name=document.getElementById('tm-name').value.trim();if(!name)return;
+    const data={name,subtitle:document.getElementById('tm-sub').value.trim(),
+      startDate:document.getElementById('tm-start').value,endDate:document.getElementById('tm-end').value,
+      members:document.getElementById('tm-members').value.split(',').map(s=>s.trim()).filter(Boolean),
+      cities:document.getElementById('tm-cities').value.split(',').map(s=>s.trim()).filter(Boolean),
+      currency:document.getElementById('tm-currency').value,ts:serverTimestamp()};
+    setSyncDot('syncing');
+    if(editTripId)await updateDoc(doc(db,'trips',editTripId),data);
+    else{const ref=await addDoc(collection(db,'trips'),data);if(!curTripId)selectTrip(ref.id);}
+    closeModal('trip-modal');toast('旅行資料已儲存 ✓');setSyncDot('on');
+  });
 };
 window.deleteTrip=async function(id){
-  if(!confirm('確定刪除這個旅行？所有行程和記帳資料都會刪除。'))return;
+  if(!confirm('確定刪除這個旅行？'))return;
   await deleteDoc(doc(db,'trips',id));
   if(curTripId===id){curTripId=null;document.getElementById('home-content').innerHTML='<div class="empty">請選擇行程</div>';}
   toast('旅行已刪除');
 };
-
-// ── TRIP LIST SCREEN ──
 window.openTripList=function(){document.getElementById('trip-list-screen').classList.add('open');};
 window.closeTripList=function(){document.getElementById('trip-list-screen').classList.remove('open');};
 
 // ── DAYS ──
 function renderDayTabs(){
   document.getElementById('day-tabs').innerHTML=days.map((d,i)=>
-    `<button class="day-btn${i===curDay?' active':''}" onclick="window.setDay(${i})">${'第'+(i+1)+'天'}<br><span style="opacity:.7;font-size:10px">${d.city||''}</span></button>`
+    `<button class="day-btn${i===curDay?' active':''}" onclick="setDay(${i})">第${i+1}天<br><span style="opacity:.7;font-size:10px">${d.city||''}</span></button>`
   ).join('');
 }
 window.setDay=function(i){curDay=i;renderDayTabs();renderItinerary();};
-
 window.openAddDay=function(){
-  document.getElementById('ad-city').value='';
-  document.getElementById('ad-stay').value='';
-  document.getElementById('add-day-modal').classList.add('open');
+  document.getElementById('ad-city').value='';document.getElementById('ad-stay').value='';
+  openModal('add-day-modal');
 };
-window.saveNewDay=async function(){
-  if(!curTripId)return;
-  const city=document.getElementById('ad-city').value.trim();
-  await addDoc(collection(db,'trips',curTripId,'days'),{city,stay:document.getElementById('ad-stay').value.trim(),order:days.length,ts:serverTimestamp()});
-  closeModal('add-day-modal');toast('已新增一天 ✓');
+window.saveNewDay=function(){
+  withLock(document.getElementById('addday-save-btn'),async()=>{
+    if(!curTripId)return;
+    await addDoc(collection(db,'trips',curTripId,'days'),{city:document.getElementById('ad-city').value.trim(),stay:document.getElementById('ad-stay').value.trim(),order:days.length,ts:serverTimestamp()});
+    closeModal('add-day-modal');toast('已新增一天 ✓');
+  });
 };
 window.deleteCurrentDay=async function(){
-  if(!days[curDay])return;
-  if(!confirm('確定刪除這一天？此天的景點也會一併刪除。'))return;
+  if(!days[curDay]){toast('尚無此天');return;}
+  if(!confirm('確定刪除此天？景點也會一併刪除。'))return;
   const dayId=days[curDay].id;
-  const spotsToDelete=spots.filter(s=>s.day===curDay);
-  for(const s of spotsToDelete) await deleteDoc(doc(db,'trips',curTripId,'spots',s.id));
+  for(const s of spots.filter(s=>s.day===curDay))await deleteDoc(doc(db,'trips',curTripId,'spots',s.id));
   await deleteDoc(doc(db,'trips',curTripId,'days',dayId));
   if(curDay>0)curDay--;
   toast('已刪除此天');
@@ -538,13 +582,10 @@ window.deleteCurrentDay=async function(){
 function renderItinerary(){
   if(!days.length){
     document.getElementById('stay-badge').innerHTML='';
-    document.getElementById('itin-body').innerHTML='<div class="empty">尚未建立行程天數<br>點「＋ 新增一天」開始</div>';
-    return;
+    document.getElementById('itin-body').innerHTML='<div class="empty">尚未建立行程天數<br>點「＋ 新增一天」開始</div>';return;
   }
-  const d=days[curDay];
-  if(!d)return;
-  document.getElementById('stay-badge').innerHTML=
-    `<div class="stay-badge">🏨 今晚：${d.stay||'未設定'}</div>`;
+  const d=days[curDay];if(!d)return;
+  document.getElementById('stay-badge').innerHTML=`<div class="stay-badge">🏨 今晚：${d.stay||'未設定'}</div>`;
   const items=spots.filter(s=>s.day===curDay).sort((a,b)=>a.t.localeCompare(b.t));
   document.getElementById('itin-body').innerHTML=items.length?items.map(s=>`
     <div class="itin-item">
@@ -559,37 +600,35 @@ function renderItinerary(){
         <div class="meta"><span class="tag ${TAG[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span>${s.note}</span>`:''}</div>
       </div>
     </div>
-    ${s.trans?`<div class="transport-hint"><div class="transport-text">🚆 ${s.trans}</div></div>`:''}`
-  ).join(''):'<div class="empty">今天還沒有行程<br>點下方新增</div>';
+    ${s.trans?`<div class="transport-hint">🚆 ${s.trans}</div>`:''}`).join('')
+    :'<div class="empty">今天還沒有行程<br>點下方新增</div>';
 }
-
 window.openSpotModal=function(){
   editSpotId=null;
   document.getElementById('spot-modal-title').textContent='新增景點';
-  document.getElementById('s-name').value='';
-  document.getElementById('s-time').value='10:00';
-  document.getElementById('s-note').value='';
-  document.getElementById('s-trans').value='';
-  document.getElementById('spot-modal').classList.add('open');
+  document.getElementById('s-name').value='';document.getElementById('s-time').value='10:00';
+  document.getElementById('s-note').value='';document.getElementById('s-trans').value='';
+  document.getElementById('s-type').value='景點';
+  openModal('spot-modal');
 };
 window.openEditSpot=function(id){
-  editSpotId=id;
-  const s=spots.find(x=>x.id===id);if(!s)return;
+  editSpotId=id;const s=spots.find(x=>x.id===id);if(!s)return;
   document.getElementById('spot-modal-title').textContent='編輯景點';
-  document.getElementById('s-name').value=s.n||'';
-  document.getElementById('s-time').value=s.t||'10:00';
-  document.getElementById('s-type').value=s.type||'景點';
-  document.getElementById('s-note').value=s.note||'';
+  document.getElementById('s-name').value=s.n||'';document.getElementById('s-time').value=s.t||'10:00';
+  document.getElementById('s-type').value=s.type||'景點';document.getElementById('s-note').value=s.note||'';
   document.getElementById('s-trans').value=s.trans||'';
-  document.getElementById('spot-modal').classList.add('open');
+  openModal('spot-modal');
 };
-window.saveSpot=async function(){
-  const n=document.getElementById('s-name').value.trim();if(!n||!curTripId)return;
-  const data={n,t:document.getElementById('s-time').value,type:document.getElementById('s-type').value,note:document.getElementById('s-note').value,trans:document.getElementById('s-trans').value,day:curDay,ts:serverTimestamp()};
-  setSyncDot('syncing');
-  if(editSpotId) await updateDoc(doc(db,'trips',curTripId,'spots',editSpotId),data);
-  else await addDoc(collection(db,'trips',curTripId,'spots'),data);
-  closeModal('spot-modal');toast(editSpotId?'景點已更新 ✓':'景點已儲存 ✓');setSyncDot('on');
+window.saveSpot=function(){
+  withLock(document.getElementById('spot-save-btn'),async()=>{
+    const n=document.getElementById('s-name').value.trim();if(!n||!curTripId)return;
+    const data={n,t:document.getElementById('s-time').value,type:document.getElementById('s-type').value,
+      note:document.getElementById('s-note').value,trans:document.getElementById('s-trans').value,day:curDay,ts:serverTimestamp()};
+    setSyncDot('syncing');
+    if(editSpotId)await updateDoc(doc(db,'trips',curTripId,'spots',editSpotId),data);
+    else await addDoc(collection(db,'trips',curTripId,'spots'),data);
+    closeModal('spot-modal');toast(editSpotId?'景點已更新 ✓':'景點已儲存 ✓');setSyncDot('on');
+  });
 };
 window.delSpot=async function(id){
   if(!confirm('確定刪除？'))return;
@@ -602,7 +641,7 @@ const presets={
     {name:'箱根神社',city:'箱根',desc:'湖中鳥居，朝霧與富士山同框',tip:'早上8點前人少',rating:4.8,icon:'⛩'},
     {name:'鶴岡八幡宮',city:'鎌倉',desc:'鎌倉最重要神社，必訪地標',tip:'入場免費',rating:4.7,icon:'🏯'},
     {name:'大涌谷',city:'箱根',desc:'火山地熱帶，黑玉子必吃',tip:'纜車可能因天氣停駛',rating:4.6,icon:'🌋'},
-    {name:'長谷寺',city:'鎌倉',desc:'6月紫陽花盛開，景色壯觀',tip:'建議平日早上前往',rating:4.6,icon:'🌸'},
+    {name:'長谷寺',city:'鎌倉',desc:'6月紫陽花盛開，景色壯觀',tip:'建議平日早上',rating:4.6,icon:'🌸'},
     {name:'橫濱紅磚倉庫',city:'橫濱',desc:'港灣景觀，餐廳與精品聚集',tip:'免費入場',rating:4.5,icon:'🧱'}
   ],
   餐廳:[
@@ -617,32 +656,38 @@ const presets={
     {name:'小田原蒲鉾老舖',city:'小田原',desc:'魚板小田原名物',tip:'可現場體驗製作',rating:4.5,icon:'🐟'}
   ]
 };
+
+function placeCardHTML(p,fromAI=false){
+  return `<div class="place-card">
+    <div class="place-thumb" style="${fromAI?'background:#f0ebff;width:50px;height:50px;font-size:22px':''}">${p.icon}</div>
+    <div class="place-info">
+      <h4>${p.name}</h4><div class="addr">📍 ${p.city}</div>
+      <div class="pdesc">${p.desc}</div>
+      <div class="pfoot">
+        <div style="display:flex;gap:8px;align-items:center">
+          <span class="rating">★ ${p.rating}</span>
+          <span style="font-size:11px;color:#888">💡 ${p.tip}</span>
+        </div>
+        <button class="add-to-btn" onclick="openAddToItin(${JSON.stringify(p).replace(/"/g,'&quot;')})">＋ 加入行程</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 window.setCat=function(btn,cat){
-  curCat=cat;
-  document.querySelectorAll('.cat-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('ai-result').innerHTML='';
-  renderPresets();
+  curCat=cat;document.querySelectorAll('.cat-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');document.getElementById('ai-result').innerHTML='';renderPresets();
 };
 function renderPresets(){
-  const list=presets[curCat]||[];
   document.getElementById('preset-list').innerHTML=
     `<div class="sec-label" style="margin-bottom:10px">精選推薦・${curCat}</div>`+
-    list.map(p=>`
-      <div class="place-card">
-        <div class="place-thumb">${p.icon}</div>
-        <div class="place-info">
-          <h4>${p.name}</h4><div class="addr">📍 ${p.city}</div>
-          <div class="pdesc">${p.desc}</div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <span class="rating">★ ${p.rating}</span>
-            <span style="font-size:11px;color:#888">💡 ${p.tip}</span>
-          </div>
-        </div>
-      </div>`).join('');
+    (presets[curCat]||[]).map(p=>placeCardHTML(p)).join('');
 }
+
 window.doSearch=async function(){
   const q=document.getElementById('q-input').value.trim();if(!q)return;
+  const btn=document.getElementById('search-btn');
+  btn.disabled=true;btn.textContent='搜尋中…';
   const box=document.getElementById('ai-result');
   box.innerHTML=`<div class="ai-result-box"><div class="ai-label">✨ AI 搜尋中</div>
     <div style="display:flex;align-items:center;gap:10px;padding:6px 0">
@@ -657,75 +702,112 @@ window.doSearch=async function(){
     const data=await res.json();
     const places=JSON.parse(data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim());
     box.innerHTML=`<div class="ai-result-box">
-      <div class="ai-label">✨ AI 推薦結果 <span class="ai-badge">AI</span></div>
-      ${places.map(p=>`
-        <div class="place-card" style="border:none;padding:10px 0;border-bottom:.5px solid #e8e0ff;border-radius:0;margin:0">
-          <div class="place-thumb" style="background:#f0ebff;width:50px;height:50px;font-size:22px">${p.icon}</div>
-          <div class="place-info"><h4>${p.name}</h4><div class="addr">📍 ${p.city}</div>
-            <div class="pdesc">${p.desc}</div>
-            <div style="display:flex;gap:8px;align-items:center"><span class="rating">★ ${p.rating}</span><span style="font-size:11px;color:#6c3fc5">💡 ${p.tip}</span></div>
-          </div>
-        </div>`).join('')}
+      <div class="ai-label">✨ 搜尋結果：${q} <span class="ai-badge">AI</span></div>
+      ${places.map(p=>placeCardHTML(p,true)).join('')}
     </div>`;
-  }catch(e){box.innerHTML=`<div class="ai-result-box"><div class="ai-label">搜尋失敗，請稍後再試</div></div>`;}
+  }catch(e){
+    box.innerHTML=`<div class="ai-result-box"><div class="ai-label">搜尋失敗，請稍後再試</div></div>`;
+  }finally{btn.disabled=false;btn.textContent='搜尋';}
+};
+
+// ── ADD TO ITIN FROM EXPLORE ──
+window.openAddToItin=function(p){
+  if(!curTripId){toast('請先選擇行程');return;}
+  if(!days.length){toast('請先在行程頁新增天數');return;}
+  aimPlace=p;aimDayIdx=curDay<days.length?curDay:0;
+  document.getElementById('aim-name').textContent=p.name;
+  document.getElementById('aim-city').textContent='📍 '+p.city;
+  document.getElementById('aim-note').value='';
+  document.getElementById('aim-time').value='10:00';
+  document.getElementById('aim-day-picker').innerHTML=days.map((d,i)=>
+    `<button class="day-pick-btn${i===aimDayIdx?' active':''}" onclick="setAimDay(${i})">第${i+1}天${d.city?' '+d.city:''}</button>`
+  ).join('');
+  openModal('add-itin-modal');
+};
+window.setAimDay=function(i){
+  aimDayIdx=i;
+  document.querySelectorAll('.day-pick-btn').forEach((b,idx)=>b.classList.toggle('active',idx===i));
+};
+window.saveAddToItin=function(){
+  withLock(document.getElementById('aim-save-btn'),async()=>{
+    if(!aimPlace||!curTripId)return;
+    await addDoc(collection(db,'trips',curTripId,'spots'),{
+      n:aimPlace.name,t:document.getElementById('aim-time').value,
+      type:curCat,note:document.getElementById('aim-note').value,
+      trans:'',day:aimDayIdx,ts:serverTimestamp()
+    });
+    closeModal('add-itin-modal');
+    toast(`已加入第${aimDayIdx+1}天行程 ✓`);
+  });
 };
 
 // ── BUDGET ──
 function renderBudgetDayFilter(){
+  const cur=getCurTrip();
+  const sym=cur?cur.currency||'¥ 日圓':'¥ 日圓';
+  document.getElementById('currency-display').innerHTML=`<div class="currency-badge">💰 記帳貨幣：${sym}</div>`;
+  document.getElementById('e-currency-label').textContent=sym;
   const tabs=[{v:'all',l:'全部'},...days.map((d,i)=>({v:i,l:`第${i+1}天 ${d.city||''}`}))];
   document.getElementById('budget-filter').innerHTML=tabs.map(t=>
     `<button class="filter-btn${t.v===curBudgetDay?' active':''}" onclick="setBDay('${t.v}')">${t.l}</button>`
   ).join('');
-  populateExpDaySelect();
-}
-function populateExpDaySelect(){
   document.getElementById('e-day').innerHTML=days.map((d,i)=>
-    `<option value="${i}">第${i+1}天${d.city?' ('+d.city+')':''}</option>`
-  ).join('');
+    `<option value="${i}">第${i+1}天${d.city?' ('+d.city+')':''}</option>`).join('');
 }
-window.setBDay=function(v){
-  curBudgetDay=v==='all'?'all':parseInt(v);
-  renderBudgetDayFilter();renderExpenses();
-};
+window.setBDay=function(v){curBudgetDay=v==='all'?'all':parseInt(v);renderBudgetDayFilter();renderExpenses();};
 function renderExpenses(){
+  const sym=(getCurTrip()||{}).currency||'¥';
+  const symShort=sym.split(' ')[0];
   const list=curBudgetDay==='all'?expenses:expenses.filter(e=>e.day===curBudgetDay);
   const total=expenses.reduce((s,e)=>s+e.amt,0);
-  document.getElementById('budget-total').textContent='¥'+total.toLocaleString();
+  document.getElementById('budget-total').textContent=symShort+total.toLocaleString();
   document.getElementById('budget-sub').textContent=`共 ${expenses.length} 筆記錄`;
-  // by category
   const cats={};expenses.forEach(e=>cats[e.cat]=(cats[e.cat]||0)+e.amt);
   document.getElementById('budget-by-cat').innerHTML=Object.entries(cats).map(([c,a])=>
-    `<span class="cat-pill">${ICONS[c]||'📦'} ${c} ¥${a.toLocaleString()}</span>`).join('');
+    `<span class="cat-pill">${ICONS[c]||'📦'} ${c} ${symShort}${a.toLocaleString()}</span>`).join('');
   document.getElementById('exp-list').innerHTML=list.length?list.map(e=>`
-    <div class="exp-item">
+    <div class="exp-item" onclick="openExpModal('${e.id}')">
       <div class="exp-left">
         <div class="exp-icon">${ICONS[e.cat]||'📦'}</div>
         <div><div class="exp-name">${e.name}</div>
         <div class="exp-meta">${e.cat}・第${(e.day||0)+1}天${days[e.day]?' '+days[e.day].city:''}</div></div>
       </div>
-      <div class="exp-right">
-        <div class="exp-amt">¥${e.amt.toLocaleString()}</div>
-        <button class="exp-del" onclick="delExp('${e.id}')">✕</button>
-      </div>
+      <div class="exp-amt">${symShort}${e.amt.toLocaleString()}</div>
     </div>`).join(''):'<div class="empty">尚無消費記錄<br>點下方按鈕新增</div>';
 }
-window.openExpModal=function(){
-  document.getElementById('e-name').value='';
-  document.getElementById('e-amt').value='';
-  populateExpDaySelect();
-  document.getElementById('exp-modal').classList.add('open');
+window.openExpModal=function(id){
+  editExpId=id||null;
+  const isEdit=!!id;
+  document.getElementById('exp-modal-title').textContent=isEdit?'編輯消費':'新增消費';
+  document.getElementById('exp-delete-btn').style.display=isEdit?'block':'none';
+  renderBudgetDayFilter();
+  if(isEdit){
+    const e=expenses.find(x=>x.id===id);if(!e)return;
+    document.getElementById('e-name').value=e.name||'';
+    document.getElementById('e-amt').value=e.amt||'';
+    document.getElementById('e-cat').value=e.cat||'餐飲';
+    document.getElementById('e-day').value=e.day||0;
+  }else{
+    document.getElementById('e-name').value='';document.getElementById('e-amt').value='';
+  }
+  openModal('exp-modal');
 };
-window.saveExp=async function(){
-  const name=document.getElementById('e-name').value.trim();
-  const amt=parseInt(document.getElementById('e-amt').value)||0;
-  if(!name||!amt||!curTripId)return;
-  setSyncDot('syncing');
-  await addDoc(collection(db,'trips',curTripId,'expenses'),{name,amt,cat:document.getElementById('e-cat').value,day:parseInt(document.getElementById('e-day').value),ts:serverTimestamp()});
-  closeModal('exp-modal');toast('消費已記錄 ✓');setSyncDot('on');
+window.saveExp=function(){
+  withLock(document.getElementById('exp-save-btn'),async()=>{
+    const name=document.getElementById('e-name').value.trim();
+    const amt=parseInt(document.getElementById('e-amt').value)||0;
+    if(!name||!amt||!curTripId)return;
+    const data={name,amt,cat:document.getElementById('e-cat').value,day:parseInt(document.getElementById('e-day').value),ts:serverTimestamp()};
+    setSyncDot('syncing');
+    if(editExpId)await updateDoc(doc(db,'trips',curTripId,'expenses',editExpId),data);
+    else await addDoc(collection(db,'trips',curTripId,'expenses'),data);
+    closeModal('exp-modal');toast(editExpId?'消費已更新 ✓':'消費已記錄 ✓');setSyncDot('on');
+  });
 };
-window.delExp=async function(id){
-  if(!confirm('確定刪除？'))return;
-  await deleteDoc(doc(db,'trips',curTripId,'expenses',id));toast('已刪除');
+window.deleteExpFromModal=async function(){
+  if(!editExpId||!confirm('確定刪除這筆消費？'))return;
+  await deleteDoc(doc(db,'trips',curTripId,'expenses',editExpId));
+  closeModal('exp-modal');toast('已刪除');
 };
 
 // ── INIT ──
