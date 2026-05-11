@@ -192,14 +192,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 .debt-arrow{color:var(--red);font-weight:600}
 
 /* BALLOON */
-.balloon-overlay{display:none;position:fixed;inset:0;z-index:600}
-.balloon-overlay.open{display:block}
-.balloon{position:absolute;background:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 40px rgba(0,0,0,.15);min-width:190px;z-index:601}
-.balloon-name{font-size:15px;font-weight:700;margin-bottom:10px;text-align:center;color:#1c1c1e}
-.balloon-avatars{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:12px}
-.b-avatar-btn{width:40px;height:40px;border-radius:50%;border:2px solid transparent;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;background:#f2f2f7}
+.balloon-overlay{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.4);align-items:center;justify-content:center}
+.balloon-overlay.open{display:flex}
+.balloon{background:#fff;border-radius:20px;padding:20px;box-shadow:0 12px 48px rgba(0,0,0,.18);width:300px;max-width:88vw}
+.balloon-name{font-size:17px;font-weight:700;margin-bottom:14px;text-align:center;color:#1c1c1e}
+.balloon-avatars{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:16px}
+.b-avatar-btn{width:44px;height:44px;border-radius:50%;border:2.5px solid transparent;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer;background:#f2f2f7}
 .b-avatar-btn.selected{border-color:var(--c);background:var(--ca)}
-.balloon-save{width:100%;padding:9px;background:var(--c);color:#fff;border:none;border-radius:9px;font-size:13px;cursor:pointer;font-weight:600;font-family:inherit}
+.balloon-btns{display:flex;gap:8px}
+.balloon-cancel{flex:1;padding:11px;background:#e5e5ea;color:#1c1c1e;border:none;border-radius:11px;font-size:14px;cursor:pointer;font-weight:500;font-family:inherit}
+.balloon-save{flex:1;padding:11px;background:var(--c);color:#fff;border:none;border-radius:11px;font-size:14px;cursor:pointer;font-weight:600;font-family:inherit}
 
 /* TOAST */
 .toast{position:fixed;bottom:calc(80px + var(--safe-bottom));left:50%;transform:translateX(-50%);background:rgba(50,50,50,.92);backdrop-filter:blur(10px);color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;z-index:999;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap}
@@ -333,7 +335,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
   <div class="balloon" id="balloon" onclick="event.stopPropagation()">
     <div class="balloon-name" id="balloon-name"></div>
     <div class="balloon-avatars" id="balloon-avatars"></div>
-    <button class="balloon-save" onclick="saveMemberAvatar()">儲存</button>
+    <div class="balloon-btns">
+      <button class="balloon-cancel" onclick="closeBalloon()">取消</button>
+      <button class="balloon-save" onclick="saveMemberAvatar()">儲存</button>
+    </div>
   </div>
 </div>
 
@@ -680,10 +685,6 @@ window.openBalloon=function(e,name){
   document.getElementById('balloon-name').textContent=name;
   document.getElementById('balloon-avatars').innerHTML=AVATARS.map(a=>
     `<button class="b-avatar-btn${a===balloonSelectedAvatar?' selected':''}" onclick="selectAvatar('${a}')">${a}</button>`).join('');
-  const b=document.getElementById('balloon');
-  const r=e.currentTarget.getBoundingClientRect();
-  b.style.left=Math.min(r.left,window.innerWidth-200)+'px';
-  b.style.top=Math.min(r.bottom+10,window.innerHeight-200)+'px';
   document.getElementById('balloon-overlay').classList.add('open');
 };
 window.selectAvatar=function(a){balloonSelectedAvatar=a;document.querySelectorAll('.b-avatar-btn').forEach(b=>b.classList.toggle('selected',b.textContent===a));};
