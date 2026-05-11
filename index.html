@@ -727,11 +727,20 @@ window.saveTrip=function(){
     setSyncDot('syncing');
     if(editTripId){
       await updateDoc(doc(db,'trips',editTripId),data);
-      // sync cities to existing days
+      // sync cities + dates to existing days
+      const newStart=startDate?new Date(startDate):null;
       for(let i=0;i<days.length;i++){
+        if(!days[i])continue;
+        const updates={};
         const newCity=cities[i]||cities[cities.length-1]||'';
-        if(days[i]&&days[i].city!==newCity)
-          await updateDoc(doc(db,'trips',editTripId,'days',days[i].id),{city:newCity});
+        if(days[i].city!==newCity)updates.city=newCity;
+        if(newStart){
+          const d=new Date(newStart);d.setDate(newStart.getDate()+i);
+          const dateStr=`${d.getMonth()+1}/${d.getDate()}`;
+          if(days[i].date!==dateStr)updates.date=dateStr;
+        }
+        if(Object.keys(updates).length)
+          await updateDoc(doc(db,'trips',editTripId,'days',days[i].id),updates);
       }
     }else{
       const ref=await addDoc(collection(db,'trips'),data);
