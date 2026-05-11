@@ -496,11 +496,9 @@ function fmt(n){return sym()+Number(n||0).toLocaleString();}
 
 let trips=[],curTripId=null,curDay=0,curBudgetDay='all',curCat='景點',curCatFilter=null;
 let spots=[],expenses=[],days=[];
-let editSpotId=null,editExpId=null,editTripId=null;
+let editSpotId=null,editExpId=null,editTripId=null,aimPlace=null,aimDayIdx=0;
 let spotsUnsub=null,expUnsub=null,daysUnsub=null;
-let aimPlace=null,aimDayIdx=0;
-let balloonMember=null,balloonSelectedAvatar=null;
-let memberAvatars={};
+let balloonMember=null,balloonSelectedAvatar=null,memberAvatars={};
 let saving=false;
 
 function withLock(btn,fn){
@@ -727,20 +725,36 @@ window.saveTrip=function(){
     setSyncDot('syncing');
     if(editTripId){
       await updateDoc(doc(db,'trips',editTripId),data);
-      // sync cities + dates to existing days
-      const newStart=startDate?new Date(startDate):null;
-      for(let i=0;i<days.length;i++){
-        if(!days[i])continue;
-        const updates={};
-        const newCity=cities[i]||cities[cities.length-1]||'';
-        if(days[i].city!==newCity)updates.city=newCity;
-        if(newStart){
+      // sync days to match new date range
+      if(startDate&&endDate){
+        const newStart=new Date(startDate);
+        const newEnd=new Date(endDate);
+        const newTotal=Math.round((newEnd-newStart)/86400000)+1;
+        const curTotal=days.length;
+
+        // update or add days
+        for(let i=0;i<newTotal;i++){
           const d=new Date(newStart);d.setDate(newStart.getDate()+i);
           const dateStr=`${d.getMonth()+1}/${d.getDate()}`;
-          if(days[i].date!==dateStr)updates.date=dateStr;
+          const newCity=cities[i]||cities[cities.length-1]||'';
+          if(i<curTotal){
+            // update existing day
+            const updates={date:dateStr,city:newCity,order:i};
+            await updateDoc(doc(db,'trips',editTripId,'days',days[i].id),updates);
+          } else {
+            // add new day
+            await addDoc(collection(db,'trips',editTripId,'days'),{city:newCity,stay:'',order:i,date:dateStr,ts:serverTimestamp()});
+          }
         }
-        if(Object.keys(updates).length)
-          await updateDoc(doc(db,'trips',editTripId,'days',days[i].id),updates);
+        // remove extra days if new range is shorter
+        if(curTotal>newTotal){
+          for(let i=newTotal;i<curTotal;i++){
+            // delete spots for this day first
+            for(const s of spots.filter(s=>s.day===i))
+              await deleteDoc(doc(db,'trips',editTripId,'spots',s.id));
+            await deleteDoc(doc(db,'trips',editTripId,'days',days[i].id));
+          }
+        }
       }
     }else{
       const ref=await addDoc(collection(db,'trips'),data);
