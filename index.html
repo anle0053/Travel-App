@@ -858,7 +858,6 @@ window.saveSpot=function(){
     closeModal('spot-modal');toast(editSpotId?'景點已更新':'景點已儲存');setSyncDot('on');
   });
 };
-let editSpotId=null;
 window.delSpot=async function(id){if(!confirm('確定刪除？'))return;await deleteDoc(doc(db,'trips',curTripId,'spots',id));toast('已刪除');};
 
 // ── EXPLORE ──
