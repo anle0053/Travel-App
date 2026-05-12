@@ -488,7 +488,7 @@ const db=getFirestore(fb);
 const TAG_CLASS={景點:'tag-spot',餐廳:'tag-food',購物:'tag-shop',交通:'tag-move',住宿:'tag-stay'};
 const CAT_COLORS={餐飲:'#fff3e0',交通:'#e8f5e9',景點門票:'#e8f4fd',購物:'#fce4ec',住宿:'#ede7f6',其他:'#f5f5f5'};
 const CAT_ICON_COLOR={餐飲:'#e65100',交通:'#2e7d32',景點門票:'#1565c0',購物:'#880e4f',住宿:'#4527a0',其他:'#555'};
-const AVATARS=['🧑','👩','🧒','👦','👧','🐱','🐶','🐻','🦊','🐼','🐨','🐯','🦁','🐸','🐙','⭐','🌸','🍀'];
+const AVATARS=['🧑','👩','🧒','👦','👧','🌙','🐟','🐱','🐶','🐻','🦊','🐨','🐯','🦁','🐙','⭐','🌸','🍀'];
 
 function parseList(s){return s.split(/[,，]/).map(x=>x.trim()).filter(Boolean);}
 function sym(){const t=getCurTrip();return t?(t.currency||'¥ 日圓').split(' ')[0]:'¥';}
