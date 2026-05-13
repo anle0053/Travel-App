@@ -828,119 +828,121 @@ window.deleteCurrentDay=async function(){
 };
 
 // ── MULTI-COLUMN ITINERARY ──
-function assignColumns(daySpots){
-  // separate full-row items
-  const fullRow=daySpots.filter(s=>s.fullRow);
-  const partial=daySpots.filter(s=>!s.fullRow);
-  if(!partial.length)return{cols:[],fullRow,times:[]};
-
-  // build columns: each col is an array of member keys
-  const cols=[];// cols[i] = Set of members
-  const spotCols=[];// spotCols[i] = col index for partial[i]
+function assignColumns(partial){
+  const cols=[];// cols[i] = Set of member names
+  const spotCols=new Map();// spot.id -> colIndex
 
   partial.forEach(s=>{
-    const members=new Set(s.members||[]);
-    if(!members.size){// no members = put in col 0
+    const mSet=new Set(s.members||[]);
+    if(!mSet.size){
       if(!cols.length)cols.push(new Set());
-      spotCols.push(0);return;
+      spotCols.set(s.id,0);return;
     }
-    // find best col: most overlap
+    // find best col: most overlap, no conflict with other cols
     let bestCol=-1,bestOverlap=-1;
-    cols.forEach((colMembers,ci)=>{
-      const overlap=[...members].filter(m=>colMembers.has(m)).length;
-      const conflict=[...members].filter(m=>{
-        return cols.some((c,i)=>i!==ci&&c.has(m));
-      }).length;
-      if(overlap>bestOverlap&&conflict===0){bestOverlap=overlap;bestCol=ci;}
+    cols.forEach((colM,ci)=>{
+      const overlap=[...mSet].filter(m=>colM.has(m)).length;
+      // check no member of this spot is already in a different col
+      const conflict=[...mSet].some(m=>cols.some((c,i)=>i!==ci&&c.has(m)));
+      if(!conflict&&overlap>bestOverlap){bestOverlap=overlap;bestCol=ci;}
     });
     if(bestCol>=0){
-      [...members].forEach(m=>cols[bestCol].add(m));
-      spotCols.push(bestCol);
+      [...mSet].forEach(m=>cols[bestCol].add(m));
+      spotCols.set(s.id,bestCol);
     }else{
-      const newCol=new Set(members);
-      cols.push(newCol);
-      spotCols.push(cols.length-1);
+      bestCol=cols.length;
+      cols.push(new Set(mSet));
+      spotCols.set(s.id,bestCol);
     }
   });
+  return{cols,spotCols};
+}
 
-  return{cols,fullRow,partial,spotCols};
+function makeCardHTML(s){
+  const avs=(s.members||[]).map(m=>`<div class="card-av">${memberAvatars[m]||m.charAt(0)}</div>`).join('');
+  return `<div class="itin-card${s.fullRow?' full-row-card':''}">
+    <div class="card-actions">
+      <button class="card-btn" onclick="openEditSpot('${s.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+      <button class="card-btn" onclick="delSpot('${s.id}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <h4>${s.n}</h4>
+    <div class="card-meta"><span class="card-tag ${TAG_CLASS[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span>${s.note}</span>`:''}</div>
+    <div class="card-members">${avs}</div>
+  </div>`;
 }
 
 function renderItinerary(){
   renderDayInfoBar();
   const grid=document.getElementById('itin-grid');
-  if(!days.length){grid.innerHTML='<div style="padding:24px;color:#c0c0c5;font-size:13px;text-align:center">尚未建立行程天數<br>點「新增一天」開始</div>';return;}
-
-  const daySpots=spots.filter(s=>s.day===curDay).sort((a,b)=>a.t.localeCompare(b.t));
-  const{cols,fullRow,partial,spotCols}=assignColumns(daySpots);
-  const numCols=Math.max(cols.length,1);
-
-  // gather all unique times
-  const allTimes=[...new Set(daySpots.map(s=>s.t))].sort();
-  if(!allTimes.length)allTimes.push('');
-
-  // time axis
-  let timeAxisHTML='';
-  allTimes.forEach(t=>{timeAxisHTML+=`<div class="time-slot"><span>${t}</span></div>`;});
-  timeAxisHTML+=`<div class="time-slot" style="height:60px"></div>`;
-
-  // build col HTML
-  let colsHTML='';
-  cols.forEach((colMembers,ci)=>{
-    const colAvatars=[...colMembers].map(m=>`<div class="col-av">${memberAvatars[m]||m.charAt(0)}</div>`).join('');
-    let colCardsHTML=`<div class="col-header"><div class="col-header-members">${colAvatars||'<span class="col-label">全部</span>'}</div></div>`;
-    allTimes.forEach(t=>{
-      const spotsAtTime=partial.filter((s,i)=>s.t===t&&spotCols[i]===ci);
-      if(spotsAtTime.length){
-        spotsAtTime.forEach(s=>{
-          const avs=(s.members||[]).map(m=>`<div class="card-av">${memberAvatars[m]||m.charAt(0)}</div>`).join('');
-          colCardsHTML+=`<div class="card-slot"><div class="itin-card">
-            <div class="card-actions">
-              <button class="card-btn" onclick="openEditSpot('${s.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-              <button class="card-btn" onclick="delSpot('${s.id}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            </div>
-            <h4>${s.n}</h4>
-            <div class="card-meta"><span class="card-tag ${TAG_CLASS[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span>${s.note}</span>`:''}</div>
-            <div class="card-members">${avs}</div>
-          </div></div>`;
-        });
-      }else{
-        colCardsHTML+=`<div class="card-slot"><div style="flex:1"></div></div>`;
-      }
-    });
-    colsHTML+=`<div class="col" style="width:${COL_W}px">${colCardsHTML}</div>`;
-  });
-
-  // full row items rendered as overlays — simplified: just append below cols
-  let fullRowHTML='';
-  if(fullRow.length){
-    fullRowHTML='<div style="padding:8px 0 0;width:100%">';
-    fullRow.forEach(s=>{
-      const avs=getMembers().map(m=>`<div class="card-av">${memberAvatars[m]||m.charAt(0)}</div>`).join('');
-      fullRowHTML+=`<div style="margin-bottom:8px;display:flex;gap:10px;align-items:flex-start">
-        <div style="width:${COL_W*numCols+8*(numCols-1)}px;flex-shrink:0">
-          <div class="itin-card" style="background:#f0f8ff;border:.5px solid #b5d4f4">
-            <div class="card-actions">
-              <button class="card-btn" onclick="openEditSpot('${s.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-              <button class="card-btn" onclick="delSpot('${s.id}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-            </div>
-            <h4 style="color:var(--cb)">全員・${s.t}・${s.n}</h4>
-            <div class="card-meta"><span class="card-tag ${TAG_CLASS[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span>${s.note}</span>`:''}</div>
-            <div class="card-members">${avs}</div>
-          </div>
-        </div>
-      </div>`;
-    });
-    fullRowHTML+='</div>';
+  if(!days.length){
+    grid.innerHTML='<div style="padding:24px;color:#c0c0c5;font-size:13px;text-align:center">尚未建立行程天數<br>點「新增一天」開始</div>';
+    return;
   }
 
-  grid.style.setProperty('--cols',numCols);
+  const daySpots=spots.filter(s=>s.day===curDay).sort((a,b)=>a.t.localeCompare(b.t));
+  const fullRowSpots=daySpots.filter(s=>s.fullRow);
+  const partialSpots=daySpots.filter(s=>!s.fullRow);
+
+  const{cols,spotCols}=assignColumns(partialSpots);
+  const numCols=Math.max(cols.length,1);
+  const CARD_H=98;// px per time slot
+  const GAP=8;
+
+  // all unique times across ALL spots (partial + fullRow)
+  const allTimes=[...new Set(daySpots.map(s=>s.t))].sort();
+
+  // time axis
+  let timeHTML='';
+  allTimes.forEach(t=>{timeHTML+=`<div class="time-slot" style="height:${CARD_H}px"><span>${t}</span></div>`;});
+  timeHTML+=`<div style="height:60px"></div>`;
+
+  // build each column
+  const colsArr=[];
+  for(let ci=0;ci<numCols;ci++){
+    const colMembers=cols[ci]?[...cols[ci]]:[];
+    const colAvatars=colMembers.map(m=>`<div class="col-av">${memberAvatars[m]||m.charAt(0)}</div>`).join('');
+    let html=`<div class="col-header"><div class="col-header-members">${colAvatars||'<span class="col-label">行程</span>'}</div></div>`;
+    allTimes.forEach(t=>{
+      const atTime=partialSpots.filter(s=>s.t===t&&spotCols.get(s.id)===ci);
+      // also show full-row spots here only in first col as spanning card
+      if(ci===0){
+        const frAtTime=fullRowSpots.filter(s=>s.t===t);
+        frAtTime.forEach(s=>{
+          html+=`<div style="height:${CARD_H}px;padding:0 0 ${GAP}px;display:flex;align-items:stretch;width:${COL_W*numCols+GAP*(numCols-1)}px">
+            <div style="flex:1;background:#e8f4fd;border-radius:11px;border:.5px solid #b5d4f4;padding:10px 12px;position:relative;overflow:hidden">
+              <div class="card-actions">
+                <button class="card-btn" onclick="openEditSpot('${s.id}')"><svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                <button class="card-btn" onclick="delSpot('${s.id}')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+              </div>
+              <h4 style="color:var(--cb);padding-right:54px">${s.n}</h4>
+              <div class="card-meta"><span class="card-tag ${TAG_CLASS[s.type]||'tag-spot'}">${s.type}</span><span style="color:var(--cb);font-size:10px">全員</span>${s.note?`<span>${s.note}</span>`:''}</div>
+              <div class="card-members">${getMembers().map(m=>`<div class="card-av">${memberAvatars[m]||m.charAt(0)}</div>`).join('')}</div>
+            </div>
+          </div>`;
+        });
+      }
+      if(atTime.length){
+        atTime.forEach(s=>{
+          html+=`<div style="height:${CARD_H}px;padding:0 0 ${GAP}px;display:flex;align-items:stretch">${makeCardHTML(s)}</div>`;
+        });
+      }else if(!fullRowSpots.some(s=>s.t===t)){
+        // empty placeholder only if no full-row at this time
+        html+=`<div style="height:${CARD_H}px;padding:0 0 ${GAP}px"></div>`;
+      }else if(ci>0){
+        // other cols need placeholder when full-row is in col 0
+        html+=`<div style="height:${CARD_H}px;padding:0 0 ${GAP}px"></div>`;
+      }
+    });
+    colsArr.push(`<div style="width:${COL_W}px;flex-shrink:0">${html}</div>`);
+  }
+
+  const totalW=numCols*COL_W+(numCols-1)*GAP;
   grid.innerHTML=`
-    <div class="time-axis">${timeAxisHTML}</div>
-    <div>
-      <div class="col-wrap">${colsHTML||`<div class="col" style="width:${COL_W}px"><div class="col-header"><span class="col-label">行程</span></div><div class="empty" style="padding:20px">今天還沒有行程<br>點上方「新增景點」</div></div>`}</div>
-      ${fullRowHTML}
+    <div class="time-axis" style="width:${44}px">${timeHTML}</div>
+    <div style="display:flex;gap:${GAP}px;padding:8px 8px 8px 0;align-items:flex-start;min-width:${totalW}px">
+      ${colsArr.join('')}
     </div>`;
+}
 }
 
 // ── SPOT MODAL ──
