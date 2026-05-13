@@ -1166,21 +1166,6 @@ window.openSettle=function(){
   openModal('settle-modal');
 };
 
-// ── SELF CHECK ──
-try{
-  // verify all required functions exist
-  const required=['showPage','selectTrip','openTripList','closeTripList','saveTrip','deleteTrip',
-    'openEditTrip','openNewTripModal','setDay','openAddDay','saveNewDay','deleteCurrentDay',
-    'openEditDay','saveEditDay','openSpotModal','openEditSpot','saveSpot','delSpot',
-    'toggleMember','toggleSelectAll','openAddToItin','setAimDay','saveAddToItin',
-    'setCat','openGoogleMaps','openExpModal','saveExp','deleteExpFromModal',
-    'updateSplitFromTotal','updateSplitNote','setBDay','toggleCatFilter','openSettle',
-    'openBalloon','selectAvatar','saveMemberAvatar','closeBalloon','goToItinerary'];
-  const missing=required.filter(f=>typeof window[f]!=='function');
-  if(missing.length)console.error('Missing functions:',missing);
-  else console.log('✓ All functions OK');
-}catch(e){console.error('Init check failed:',e);}
-
 // ── INIT ──
 renderPresets();
 </script>
