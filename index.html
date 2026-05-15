@@ -78,7 +78,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 .itin-scroll-wrap{flex:1;overflow:hidden;position:relative}
 .itin-hscroll{overflow-x:auto;overflow-y:auto;height:100%;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:40px}
 .itin-hscroll::-webkit-scrollbar{display:none}
-.itin-grid{display:flex;min-height:100%}
+.itin-grid{display:flex;flex-direction:row;min-height:100%;align-items:flex-start}
 .col-header{background:#fff;border-radius:10px;padding:7px 10px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
 .col-av{width:24px;height:24px;border-radius:50%;background:#e8f4fd;font-size:14px;display:flex;align-items:center;justify-content:center}
 .col-label{font-size:11px;color:var(--sub)}
@@ -733,50 +733,69 @@ function renderItinerary(){
   const daySpots=spots.filter(s=>s.day===curDay).sort((a,b)=>a.t.localeCompare(b.t));
   if(!daySpots.length){grid.innerHTML=`<div style="padding:24px;color:#c0c0c5;font-size:13px;text-align:center">今天還沒有行程<br>點上方「新增景點」</div>`;return;}
 
-  const fullRow=daySpots.filter(s=>s.fullRow);
+  const fullRows=daySpots.filter(s=>s.fullRow);
   const partial=daySpots.filter(s=>!s.fullRow);
   const{cols,spotCol}=assignCols(partial);
   const numCols=Math.max(cols.length,1);
+  const totalW=numCols*COL_W+(numCols-1)*GAP;
   const allTimes=[...new Set(daySpots.map(s=>s.t))].sort();
 
-  const timeHTML=allTimes.map(t=>`<div style="height:${CARD_H}px;display:flex;align-items:flex-start;padding-top:10px;justify-content:flex-end;padding-right:8px"><span style="font-size:10px;color:var(--sub);white-space:nowrap">${t}</span></div>`).join('')+`<div style="height:60px"></div>`;
+  // 左側時間軸
+  const timeCol=`<div style="width:44px;flex-shrink:0;position:sticky;left:0;z-index:10;background:#f2f2f7;padding-top:44px">
+    ${allTimes.map(t=>{
+      // 全員活動可能有多筆，每筆佔一個 CARD_H
+      const frCount=fullRows.filter(s=>s.t===t).length||0;
+      const rowH=(frCount>0?frCount:1)*CARD_H;
+      return`<div style="height:${rowH}px;display:flex;align-items:flex-start;padding-top:10px;justify-content:flex-end;padding-right:8px"><span style="font-size:10px;color:var(--sub);white-space:nowrap">${t}</span></div>`;
+    }).join('')}
+    <div style="height:60px"></div>
+  </div>`;
 
-  const colsHTML=Array.from({length:numCols},(_,ci)=>{
-    const colM=cols[ci]?[...cols[ci]]:[];
-    const hdr=`<div class="col-header">${colM.map(m=>`<div class="col-av">${av(m)}</div>`).join('')||'<span class="col-label">行程</span>'}</div>`;
-    const rows=allTimes.map(t=>{
-      // 全員活動
-      if(ci===0){
-        const fr=fullRow.filter(s=>s.t===t);
-        if(fr.length){
-          const spanW=numCols*COL_W+(numCols-1)*GAP;
-          return fr.map(s=>`<div style="height:${CARD_H}px;padding:0 0 ${GAP}px;display:flex;align-items:stretch;width:${spanW}px">
-            <div style="flex:1;background:#e8f4fd;border-radius:11px;border:.5px solid #b5d4f4;padding:10px 12px;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;">
-              ${cardActions(s.id)}
-              <h4 style="color:var(--cb);padding-right:54px">${s.n}</h4>
-              <div class="card-meta"><span class="card-tag ${TAG_CLASS[s.type]||'tag-spot'}">${s.type}</span><span style="font-size:10px;color:var(--cb);font-weight:500">全員</span>${s.note?`<span>${s.note}</span>`:''}</div>
-              <div class="card-members">${memberAVs(getMembers())}</div>
-            </div></div>`).join('');
-        }
-      }else if(fullRow.some(s=>s.t===t))return`<div style="height:${CARD_H}px"></div>`;
+  // 右側欄位區（每欄各自渲染每個 time slot 的格子）
+  // 全員活動：在欄位區上方，用絕對定位不合適，改用「欄位 0 emit 全寬 row，其他欄 emit 空格」
+  // 正確做法：把全員活動獨立成整列，放在各欄並排的 wrapper 裡，用一個橫跨全寬的 div
 
+  // 建構：每個 time slot → 一個 row div（包含所有欄的格子）
+  const rowsHTML=allTimes.map(t=>{
+    const fr=fullRows.filter(s=>s.t===t);
+    if(fr.length){
+      // 全員活動 row：一個橫跨全寬的卡片
+      return fr.map(s=>`<div style="width:${totalW}px;padding:0 0 ${GAP}px">
+        <div style="background:#e8f4fd;border-radius:11px;border:.5px solid #b5d4f4;padding:10px 12px;position:relative;min-height:${CARD_H-GAP}px;display:flex;flex-direction:column;justify-content:space-between;">
+          ${cardActions(s.id)}
+          <h4 style="color:var(--cb);padding-right:54px">${s.n}</h4>
+          <div class="card-meta"><span class="card-tag ${TAG_CLASS[s.type]||'tag-spot'}">${s.type}</span><span style="font-size:10px;color:var(--cb);font-weight:500">全員</span>${s.note?`<span>${s.note}</span>`:''}</div>
+          <div class="card-members">${memberAVs(getMembers())}</div>
+        </div></div>`).join('');
+    }
+    // 一般 row：每欄各自渲染
+    const cellsHTML=Array.from({length:numCols},(_,ci)=>{
       const atTime=partial.filter(s=>s.t===t&&spotCol.get(s.id)===ci);
-      if(atTime.length)return atTime.map(s=>`<div style="height:${CARD_H}px;padding:0 0 ${GAP}px;display:flex;align-items:stretch">
-        <div class="itin-card">
+      if(atTime.length)return atTime.map(s=>`<div class="itin-card" style="width:${COL_W}px;flex-shrink:0;margin-right:${ci<numCols-1?GAP:0}px;min-height:${CARD_H-GAP}px;margin-bottom:${GAP}px">
           ${cardActions(s.id)}
           <h4>${s.n}</h4>
           <div class="card-meta"><span class="card-tag ${TAG_CLASS[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span>${s.note}</span>`:''}</div>
           <div class="card-members">${memberAVs(s.members)}</div>
-        </div></div>`).join('');
-      return`<div style="height:${CARD_H}px;padding:0 0 ${GAP}px"></div>`;
+        </div>`).join('');
+      return`<div style="width:${COL_W}px;flex-shrink:0;height:${CARD_H}px;margin-right:${ci<numCols-1?GAP:0}px"></div>`;
     }).join('');
-    return`<div style="width:${COL_W}px;flex-shrink:0">${hdr}${rows}</div>`;
+    return`<div style="display:flex;flex-direction:row">${cellsHTML}</div>`;
   }).join('');
 
-  const totalW=numCols*COL_W+(numCols-1)*GAP;
+  // 欄位標題列
+  const headersHTML=Array.from({length:numCols},(_,ci)=>{
+    const colM=cols[ci]?[...cols[ci]]:[];
+    return`<div style="width:${COL_W}px;flex-shrink:0;margin-right:${ci<numCols-1?GAP:0}px">
+      <div class="col-header">${colM.map(m=>`<div class="col-av">${av(m)}</div>`).join('')||'<span class="col-label">行程</span>'}</div>
+    </div>`;
+  }).join('');
+
   grid.innerHTML=`
-    <div style="width:44px;flex-shrink:0;position:sticky;left:0;z-index:10;background:#f2f2f7">${timeHTML}</div>
-    <div style="display:flex;gap:${GAP}px;padding:8px 16px 8px 0;min-width:${totalW}px">${colsHTML}</div>`;
+    ${timeCol}
+    <div style="padding:8px 16px 60px 0;min-width:${totalW}px">
+      <div style="display:flex;flex-direction:row;margin-bottom:4px">${headersHTML}</div>
+      ${rowsHTML}
+    </div>`;
 }
 
 // ── 景點 Modal ──
