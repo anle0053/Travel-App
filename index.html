@@ -243,7 +243,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 <div class="login-screen" id="login-screen">
   <div class="login-logo">✈️</div>
   <div class="login-title">旅遊助手</div>
-  <div class="login-sub">Dan 和家人的旅行規劃工具<br>請登入以存取你的旅行</div>
+  <div class="login-sub">給家人的旅行規劃工具<br>請登入以存取你的旅行</div>
   <div class="login-card">
     <h3 id="auth-title">登入</h3>
     <button class="google-btn" onclick="signInGoogle()">
@@ -343,7 +343,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
       <div style="font-size:12px;color:var(--sub)" id="um-email"></div>
     </div>
     <div class="frow" style="margin-bottom:0">
-      <label>邀請家人加入旅行</label>
+      <label>邀請對方加入旅行</label>
       <div style="font-size:12px;color:var(--sub);margin-bottom:8px">分享連結，對方點擊後即可加入目前行程</div>
       <button class="full-btn" style="margin-bottom:0" onclick="genInvite()" id="gen-invite-btn">產生邀請連結</button>
       <div id="invite-result" style="display:none" class="invite-box">
@@ -417,19 +417,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
       <label style="display:flex;justify-content:space-between;align-items:center">參與成員<button class="select-all-btn" onclick="toggleSelectAll()">全選／取消</button></label>
       <div class="member-check-row" id="member-checks"></div>
     </div>
-    <div class="frow">
-      <div style="display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:10px;padding:13px">
-        <div>
-          <div style="font-size:14px;font-weight:500;color:#1c1c1e">全員活動</div>
-          <div style="font-size:11px;color:var(--sub);margin-top:2px">卡片橫跨所有成員欄位，顯示藍色</div>
-        </div>
-        <label style="position:relative;width:44px;height:26px;flex-shrink:0;cursor:pointer">
-          <input type="checkbox" id="s-fullrow" style="opacity:0;width:0;height:0;position:absolute">
-          <span id="s-fullrow-track" style="position:absolute;inset:0;border-radius:13px;background:#e0e0e0;transition:.2s"></span>
-          <span id="s-fullrow-thumb" style="position:absolute;left:2px;top:2px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.2)"></span>
-        </label>
-      </div>
-    </div>
     <div class="modal-btns"><button class="btn-cancel" id="spot-cancel-btn">取消</button><button class="btn-save" id="spot-save-btn" onclick="saveSpot()">儲存</button></div>
   </div>
 </div>
@@ -494,7 +481,7 @@ const CAT_SVG_PATH={
   住宿:`<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>`,
   其他:`<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>`
 };
-const AVATARS=['🧑','👩','🧒','👦','👧','🐱','🐶','🐻','🦊','🐼','🐨','🐯','🦁','🐸','🐙','⭐','🌸','🍀'];
+const AVATARS=['🧑','👩','🧒','👦','👧','🌙','🐟','🐱','🐶','🐻','🦊','🐼','🐨','🐯','🦁','🐸','🐙','⭐','🌸','🍀'];
 const MEMBER_COLORS=['#e8f4fd','#fef3f0','#e8f5e9','#fff8f0','#f0ebff','#fdf5ff'];
 const COL_W=300,CARD_H=98,GAP=8;
 
@@ -1013,18 +1000,10 @@ window.toggleSelectAll=function(){
 };
 const getSelectedMembers=()=>[...document.querySelectorAll('.member-check.selected')].map(el=>el.querySelector('.mc-name').textContent);
 
-function updateFullrowToggle(checked){
-  const track=$('s-fullrow-track'),thumb=$('s-fullrow-thumb');
-  if(!track)return;
-  track.style.background=checked?'var(--c)':'#e0e0e0';
-  thumb.style.left=checked?'20px':'2px';
-}
 window.openSpotModal=function(){
   editSpotId=null;$('spot-modal-title').textContent='新增景點';
   ['s-name','s-note','s-trans'].forEach(id=>$(id).value='');
-  $('s-time').value='10:00';$('s-type').value='景點';$('s-fullrow').checked=false;
-  updateFullrowToggle(false);
-  $('s-fullrow').onchange=()=>updateFullrowToggle($('s-fullrow').checked);
+  $('s-time').value='10:00';$('s-type').value='景點';
   renderMemberChecks();openModal('spot-modal');
 };
 window.openEditSpot=function(id){
@@ -1032,15 +1011,13 @@ window.openEditSpot=function(id){
   $('spot-modal-title').textContent='編輯景點';
   $('s-name').value=s.n||'';$('s-time').value=s.t||'10:00';
   $('s-type').value=s.type||'景點';$('s-note').value=s.note||'';
-  $('s-trans').value=s.trans||'';$('s-fullrow').checked=s.fullRow||false;
-  updateFullrowToggle(s.fullRow||false);
-  $('s-fullrow').onchange=()=>updateFullrowToggle($('s-fullrow').checked);
+  $('s-trans').value=s.trans||'';
   renderMemberChecks(s.members||[]);openModal('spot-modal');
 };
 window.saveSpot=function(){
   withLock($('spot-save-btn'),async()=>{
     const n=val('s-name').trim();if(!n||!curTripId)return;
-    const data={n,t:val('s-time'),type:val('s-type'),note:val('s-note'),trans:val('s-trans'),members:getSelectedMembers(),fullRow:$('s-fullrow').checked,day:curDay,ts:serverTimestamp()};
+    const data={n,t:val('s-time'),type:val('s-type'),note:val('s-note'),trans:val('s-trans'),members:getSelectedMembers(),fullRow:false,day:curDay,ts:serverTimestamp()};
     setSyncDot('syncing');
     if(editSpotId)await updateDoc(doc(db,'trips',curTripId,'spots',editSpotId),data);
     else await addDoc(collection(db,'trips',curTripId,'spots'),data);
