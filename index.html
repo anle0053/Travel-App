@@ -243,7 +243,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 <div class="login-screen" id="login-screen">
   <div class="login-logo">✈️</div>
   <div class="login-title">旅遊助手</div>
-  <div class="login-sub">給家人的旅行規劃工具<br>請登入以存取你的旅行規劃</div>
+  <div class="login-sub">給家人的旅行規劃工具<br>請登入以存取你的行程</div>
   <div class="login-card">
     <h3 id="auth-title">登入</h3>
     <button class="google-btn" onclick="signInGoogle()">
@@ -462,7 +462,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,where,serverTimestamp,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const fb=initializeApp({apiKey:"AIzaSyDnY5wcb0QXOPXzAvRmrqltESS_U5afCS8",authDomain:"travel-app-38ad8.firebaseapp.com",projectId:"travel-app-38ad8",storageBucket:"travel-app-38ad8.firebasestorage.app",messagingSenderId:"306708070000",appId:"1:306708070000:web:716f2db183d2e432357eb5"});
@@ -557,6 +557,7 @@ onAuthStateChanged(auth,async user=>{
     if(user.photoURL){av_el.innerHTML=`<img src="${user.photoURL}">`;}
     else{av_el.textContent=(user.displayName||user.email||'?').charAt(0).toUpperCase();}
     name_el.textContent=(user.displayName||user.email||'').split('@')[0];
+    $('header-sub').textContent='歡迎，'+(user.displayName||user.email||'').split('@')[0];
     // 檢查邀請 token（URL ?invite=xxx）
     const urlToken=new URLSearchParams(location.search).get('invite');
     if(urlToken)await handleInvite(urlToken);
@@ -658,28 +659,24 @@ function nextDay(dir){
   if(n>=0&&n<days.length){curDay=n;renderDayTabs();renderItinerary();hscroll.scrollLeft=0;}
 }
 
-// ── 旅行清單（依登入UID篩選）──
+// ── 旅行清單 ──
 function startTripListener(){
   if(window._tripUnsub)window._tripUnsub();
   if(!curUser)return;
   const uid=curUser.uid;
-  // 監聽「我建立的」或「我被加入的」旅行（兩個 query 合併）
-  let ownedTrips=[],memberTrips=[];
-  const merge=()=>{
-    const all=[...ownedTrips,...memberTrips];
-    const seen=new Set();trips=all.filter(t=>!seen.has(t.id)&&seen.add(t.id));
-    trips.sort((a,b)=>(a.ts?.seconds||0)-(b.ts?.seconds||0));
-    setSyncDot('on');renderTripList();
+  // 撈所有旅行，前端篩選「我建立的 / 我被加入的 / 舊資料（無ownerId）」
+  window._tripUnsub=onSnapshot(query(collection(db,'trips'),orderBy('ts')),snap=>{
+    trips=[];
+    snap.forEach(d=>{
+      const t={...d.data(),id:d.id};
+      const mine=!t.ownerId||t.ownerId===uid||(t.memberIds||[]).includes(uid);
+      if(mine)trips.push(t);
+    });
+    setSyncDot('on');
+    renderTripList();
     if(!curTripId&&trips.length>0)selectTrip(trips[0].id);
     else if(curTripId)renderHome();
-  };
-  const u1=onSnapshot(query(collection(db,'trips'),where('ownerId','==',uid),orderBy('ts')),snap=>{
-    ownedTrips=[];snap.forEach(d=>ownedTrips.push({...d.data(),id:d.id}));merge();
   },()=>setSyncDot('off'));
-  const u2=onSnapshot(query(collection(db,'trips'),where('memberIds','array-contains',uid),orderBy('ts')),snap=>{
-    memberTrips=[];snap.forEach(d=>memberTrips.push({...d.data(),id:d.id}));merge();
-  },()=>setSyncDot('off'));
-  window._tripUnsub=()=>{u1();u2();};
 }
 
 function renderTripList(){
@@ -931,11 +928,11 @@ function renderItinerary(){
   const totalW=numCols*COL_W+(numCols-1)*GAP;
   const allTimes=[...new Set(daySpots.map(s=>s.t))].sort();
 
-  // 左側時間軸
+  // 左側時間軸 - 高度與右側 row 保持一致
   const timeCol=`<div style="width:44px;flex-shrink:0;position:sticky;left:0;z-index:10;background:#f2f2f7;padding-top:44px">
     ${allTimes.map(t=>{
-      // 全員活動可能有多筆，每筆佔一個 CARD_H
-      const frCount=fullRows.filter(s=>s.t===t).length||0;
+      const frCount=fullRows.filter(s=>s.t===t).length;
+      // 全員活動：每筆各佔一個 CARD_H；一般景點：固定 CARD_H
       const rowH=(frCount>0?frCount:1)*CARD_H;
       return`<div style="height:${rowH}px;display:flex;align-items:flex-start;padding-top:10px;justify-content:flex-end;padding-right:8px"><span style="font-size:10px;color:var(--sub);white-space:nowrap">${t}</span></div>`;
     }).join('')}
