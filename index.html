@@ -210,13 +210,64 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 .ti-meta{font-size:12px;color:var(--sub);margin-top:3px}
 .ti-badge{background:var(--c);color:#fff;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:500}
 .icon-btn{background:none;border:none;font-size:17px;cursor:pointer;padding:5px}
+/* AUTH */
+.login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#1a5f7a,#2e7d9f,#3d9ec0);z-index:900;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;max-width:430px;margin:0 auto}
+.login-logo{font-size:52px;margin-bottom:12px}
+.login-title{font-size:26px;font-weight:700;color:#fff;margin-bottom:6px}
+.login-sub{font-size:14px;color:rgba(255,255,255,.7);margin-bottom:40px;text-align:center;line-height:1.6}
+.login-card{background:#fff;border-radius:20px;padding:24px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.login-card h3{font-size:16px;font-weight:700;color:#1c1c1e;margin-bottom:16px;text-align:center}
+.login-or{text-align:center;font-size:12px;color:var(--sub);margin:12px 0;display:flex;align-items:center;gap:8px}
+.login-or::before,.login-or::after{content:'';flex:1;height:.5px;background:#e0e0e0}
+.google-btn{width:100%;padding:13px;background:#fff;border:1.5px solid #e0e0e0;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;font-family:inherit;color:#1c1c1e;margin-bottom:10px}
+.google-btn:active{background:#f5f5f5}
+.google-icon{width:20px;height:20px;flex-shrink:0}
+.email-btn{width:100%;padding:13px;background:var(--c);border:none;border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;color:#fff;font-family:inherit}
+.auth-input{width:100%;padding:11px 13px;border:.5px solid #e0e0e0;border-radius:10px;font-size:15px;background:#f9f9f9;color:#1c1c1e;font-family:inherit;outline:none;margin-bottom:8px}
+.auth-input:focus{border-color:var(--c);background:#fff}
+.auth-err{font-size:12px;color:var(--red);text-align:center;min-height:16px;margin-bottom:8px}
+.auth-switch{font-size:12px;color:var(--c);text-align:center;cursor:pointer;margin-top:10px}
+/* user chip in header */
+.user-chip{display:flex;align-items:center;gap:6px;cursor:pointer;padding:3px 8px 3px 3px;border-radius:20px;background:rgba(255,255,255,.15)}
+.user-av{width:28px;height:28px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:15px;overflow:hidden}
+.user-av img{width:100%;height:100%;object-fit:cover}
+.user-name{font-size:12px;color:#fff;font-weight:500;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* invite */
+.invite-box{background:var(--ca);border:.5px solid #b5d4f4;border-radius:12px;padding:14px;margin-top:12px}
+.invite-url{font-size:11px;color:var(--cb);word-break:break-all;margin-bottom:8px;line-height:1.5}
+.copy-btn{padding:7px 14px;background:var(--c);color:#fff;border:none;border-radius:8px;font-size:12px;cursor:pointer;font-weight:500;font-family:inherit}
 </style>
 </head>
 <body>
-<div class="app">
+<!-- 登入畫面 -->
+<div class="login-screen" id="login-screen">
+  <div class="login-logo">✈️</div>
+  <div class="login-title">旅遊助手</div>
+  <div class="login-sub">Dan 和家人的旅行規劃工具<br>請登入以存取你的旅行</div>
+  <div class="login-card">
+    <h3 id="auth-title">登入</h3>
+    <button class="google-btn" onclick="signInGoogle()">
+      <svg class="google-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      使用 Google 帳號登入
+    </button>
+    <div class="login-or">或</div>
+    <div id="email-form">
+      <input class="auth-input" id="auth-email" type="email" placeholder="電子郵件" autocomplete="email">
+      <input class="auth-input" id="auth-pw" type="password" placeholder="密碼（至少6位）" autocomplete="current-password">
+      <div class="auth-err" id="auth-err"></div>
+      <button class="email-btn" id="auth-submit-btn" onclick="signInEmail()">登入</button>
+      <div class="auth-switch" id="auth-switch" onclick="toggleAuthMode()">還沒有帳號？點此註冊</div>
+    </div>
+  </div>
+</div>
+
+<div class="app" id="main-app" style="display:none">
   <div class="header">
     <div><h1>旅遊助手</h1><div class="sub" id="header-sub">載入中…</div></div>
-    <div class="sync-dot off" id="sync-dot"></div>
+    <div class="user-chip" onclick="openUserMenu()">
+      <div class="user-av" id="user-av">?</div>
+      <span class="user-name" id="user-name-chip"></span>
+    </div>
   </div>
   <div class="pages">
     <div class="page active" id="page-home">
@@ -281,6 +332,28 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
     <button class="nav-btn" onclick="showPage('explore',this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>探索</button>
     <button class="nav-btn" onclick="showPage('budget',this)"><div class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div>記帳</button>
   </nav>
+</div><!-- /main-app -->
+
+<!-- 使用者選單 -->
+<div class="overlay" id="user-menu-modal">
+  <div class="modal"><div class="modal-handle"></div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:20px">
+      <div id="um-avatar" style="width:56px;height:56px;border-radius:50%;background:#e8f4fd;font-size:30px;display:flex;align-items:center;justify-content:center;overflow:hidden"></div>
+      <div style="font-size:16px;font-weight:700" id="um-name"></div>
+      <div style="font-size:12px;color:var(--sub)" id="um-email"></div>
+    </div>
+    <div class="frow" style="margin-bottom:0">
+      <label>邀請家人加入旅行</label>
+      <div style="font-size:12px;color:var(--sub);margin-bottom:8px">分享連結，對方點擊後即可加入目前行程</div>
+      <button class="full-btn" style="margin-bottom:0" onclick="genInvite()" id="gen-invite-btn">產生邀請連結</button>
+      <div id="invite-result" style="display:none" class="invite-box">
+        <div class="invite-url" id="invite-url"></div>
+        <button class="copy-btn" onclick="copyInvite()">複製連結</button>
+      </div>
+    </div>
+    <button class="btn-danger" onclick="doSignOut()" style="margin-top:16px">登出</button>
+    <div class="modal-btns" style="margin-top:8px"><button class="btn-cancel" id="user-menu-cancel">關閉</button></div>
+  </div>
 </div>
 
 <div class="screen" id="trip-list-screen">
@@ -389,10 +462,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,where,serverTimestamp,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const fb=initializeApp({apiKey:"AIzaSyDnY5wcb0QXOPXzAvRmrqltESS_U5afCS8",authDomain:"travel-app-38ad8.firebaseapp.com",projectId:"travel-app-38ad8",storageBucket:"travel-app-38ad8.firebasestorage.app",messagingSenderId:"306708070000",appId:"1:306708070000:web:716f2db183d2e432357eb5"});
 const db=getFirestore(fb);
+const auth=getAuth(fb);
+const gProvider=new GoogleAuthProvider();
 
 // ── 常數 ──
 const TAG_CLASS={景點:'tag-spot',餐廳:'tag-food',購物:'tag-shop',交通:'tag-move',住宿:'tag-stay'};
@@ -406,7 +482,7 @@ const CAT_SVG_PATH={
   住宿:`<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>`,
   其他:`<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>`
 };
-const AVATARS=['🧑','👩','🧒','👦','👧','🐱','🐶','🐻','🦊','🐼','🐨','🐯','🦁','🐸','🐙','⭐','🌸','🍀'];
+const AVATARS=['🧑','👩','🧒','👦','👧','🌙','🐟','🐱','🐶','🐻','🦊','🐼','🐨','🐯','🦁','🐸','🐙','⭐','🌸','🍀'];
 const MEMBER_COLORS=['#e8f4fd','#fef3f0','#e8f5e9','#fff8f0','#f0ebff','#fdf5ff'];
 const COL_W=300,CARD_H=98,GAP=8;
 
@@ -421,7 +497,7 @@ let trips=[],curTripId=null,curDay=0,curBudgetDay='all',curCat='景點',curCatFi
 let spots=[],expenses=[],days=[];
 let editSpotId=null,editExpId=null,editTripId=null,aimPlace=null,aimDayIdx=0;
 let balloonMember=null,balloonSelectedAvatar=null,memberAvatars={};
-let saving=false;
+let saving=false,curUser=null,isRegMode=false;
 
 // ── 工具函式 ──
 const parseList=(s)=>s.split(/[,，]/).map(x=>x.trim()).filter(Boolean);
@@ -439,7 +515,106 @@ function withLock(btn,fn){
   if(btn)btn.disabled=true;
   Promise.resolve(fn()).finally(()=>{saving=false;if(btn)btn.disabled=false;});
 }
-const setSyncDot=(s)=>$('sync-dot').className='sync-dot'+(s==='syncing'?' syncing':s==='on'?'':' off');
+const setSyncDot=(s)=>{const el=$('sync-dot');if(el)el.className='sync-dot'+(s==='syncing'?' syncing':s==='on'?'':' off');};
+
+// ── Auth UI ──
+let authMode='login';
+window.toggleAuthMode=function(){
+  authMode=authMode==='login'?'register':'login';
+  $('auth-title').textContent=authMode==='login'?'登入':'註冊';
+  $('auth-submit-btn').textContent=authMode==='login'?'登入':'建立帳號';
+  $('auth-switch').textContent=authMode==='login'?'還沒有帳號？點此註冊':'已有帳號？點此登入';
+  $('auth-err').textContent='';
+};
+function setAuthErr(msg){$('auth-err').textContent=msg;}
+
+window.signInGoogle=async function(){
+  setAuthErr('');
+  try{await signInWithPopup(auth,gProvider);}
+  catch(e){setAuthErr(e.code==='auth/popup-closed-by-user'?'視窗已關閉，請再試':'登入失敗：'+e.message);}
+};
+window.signInEmail=async function(){
+  setAuthErr('');
+  const email=val('auth-email').trim(),pw=val('auth-pw');
+  if(!email||!pw){setAuthErr('請輸入Email和密碼');return;}
+  try{
+    if(authMode==='login')await signInWithEmailAndPassword(auth,email,pw);
+    else await createUserWithEmailAndPassword(auth,email,pw);
+  }catch(e){
+    const msgs={'auth/user-not-found':'找不到此帳號','auth/wrong-password':'密碼錯誤','auth/email-already-in-use':'此Email已被使用','auth/invalid-email':'Email格式錯誤','auth/weak-password':'密碼至少需要6位'};
+    setAuthErr(msgs[e.code]||e.message);
+  }
+};
+
+// 登入狀態監聽
+onAuthStateChanged(auth,async user=>{
+  curUser=user;
+  if(user){
+    $('login-screen').style.display='none';
+    $('main-app').style.display='flex';
+    // 更新 header user chip
+    const av_el=$('user-av'),name_el=$('user-name-chip');
+    if(user.photoURL){av_el.innerHTML=`<img src="${user.photoURL}">`;}
+    else{av_el.textContent=(user.displayName||user.email||'?').charAt(0).toUpperCase();}
+    name_el.textContent=(user.displayName||user.email||'').split('@')[0];
+    // 檢查邀請 token（URL ?invite=xxx）
+    const urlToken=new URLSearchParams(location.search).get('invite');
+    if(urlToken)await handleInvite(urlToken);
+    startTripListener();
+  }else{
+    $('login-screen').style.display='flex';
+    $('main-app').style.display='none';
+    if(window._tripUnsub)window._tripUnsub();
+  }
+});
+
+// ── 使用者選單 ──
+setupModal('user-menu-modal','user-menu-cancel');
+window.openUserMenu=function(){
+  if(!curUser)return;
+  const av_el=$('um-avatar');
+  if(curUser.photoURL)av_el.innerHTML=`<img src="${curUser.photoURL}" style="width:100%;height:100%;object-fit:cover">`;
+  else av_el.textContent=(curUser.displayName||curUser.email||'?').charAt(0).toUpperCase();
+  $('um-name').textContent=curUser.displayName||'';
+  $('um-email').textContent=curUser.email||'';
+  $('invite-result').style.display='none';
+  openModal('user-menu-modal');
+};
+window.doSignOut=async function(){
+  if(!confirm('確定要登出？'))return;
+  await signOut(auth);closeModal('user-menu-modal');
+};
+
+// ── 邀請機制 ──
+window.genInvite=async function(){
+  if(!curTripId){toast('請先選擇行程');return;}
+  const token=Math.random().toString(36).slice(2)+Date.now().toString(36);
+  await setDoc(doc(db,'invites',token),{tripId:curTripId,by:curUser.uid,ts:serverTimestamp()});
+  const url=`${location.origin}${location.pathname}?invite=${token}`;
+  $('invite-url').textContent=url;
+  $('invite-result').style.display='block';
+  window._inviteUrl=url;
+};
+window.copyInvite=function(){
+  navigator.clipboard.writeText(window._inviteUrl||'').then(()=>toast('連結已複製！')).catch(()=>toast('請手動複製連結'));
+};
+async function handleInvite(token){
+  try{
+    const snap=await getDoc(doc(db,'invites',token));
+    if(!snap.exists()){toast('邀請連結已失效');return;}
+    const{tripId}=snap.data();
+    const tripSnap=await getDoc(doc(db,'trips',tripId));
+    if(!tripSnap.exists()){toast('找不到對應旅行');return;}
+    const data=tripSnap.data();
+    const memberIds=data.memberIds||[];
+    if(!memberIds.includes(curUser.uid)){
+      await updateDoc(doc(db,'trips',tripId),{memberIds:[...memberIds,curUser.uid]});
+      toast('已加入旅行：'+data.name);
+    }else{toast('你已經是此旅行成員');}
+    // 清掉 URL 的 invite 參數
+    history.replaceState({},'',location.pathname);
+  }catch(e){toast('加入失敗：'+e.message);}
+}
 function toast(m){const el=$('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
 
 function setupModal(oid,cid){
@@ -483,13 +658,29 @@ function nextDay(dir){
   if(n>=0&&n<days.length){curDay=n;renderDayTabs();renderItinerary();hscroll.scrollLeft=0;}
 }
 
-// ── 旅行清單 ──
-onSnapshot(query(collection(db,'trips'),orderBy('ts')),snap=>{
-  trips=[];snap.forEach(d=>trips.push({...d.data(),id:d.id}));
-  setSyncDot('on');renderTripList();
-  if(!curTripId&&trips.length>0)selectTrip(trips[0].id);
-  else if(curTripId)renderHome();
-},()=>setSyncDot('off'));
+// ── 旅行清單（依登入UID篩選）──
+function startTripListener(){
+  if(window._tripUnsub)window._tripUnsub();
+  if(!curUser)return;
+  const uid=curUser.uid;
+  // 監聽「我建立的」或「我被加入的」旅行（兩個 query 合併）
+  let ownedTrips=[],memberTrips=[];
+  const merge=()=>{
+    const all=[...ownedTrips,...memberTrips];
+    const seen=new Set();trips=all.filter(t=>!seen.has(t.id)&&seen.add(t.id));
+    trips.sort((a,b)=>(a.ts?.seconds||0)-(b.ts?.seconds||0));
+    setSyncDot('on');renderTripList();
+    if(!curTripId&&trips.length>0)selectTrip(trips[0].id);
+    else if(curTripId)renderHome();
+  };
+  const u1=onSnapshot(query(collection(db,'trips'),where('ownerId','==',uid),orderBy('ts')),snap=>{
+    ownedTrips=[];snap.forEach(d=>ownedTrips.push({...d.data(),id:d.id}));merge();
+  },()=>setSyncDot('off'));
+  const u2=onSnapshot(query(collection(db,'trips'),where('memberIds','array-contains',uid),orderBy('ts')),snap=>{
+    memberTrips=[];snap.forEach(d=>memberTrips.push({...d.data(),id:d.id}));merge();
+  },()=>setSyncDot('off'));
+  window._tripUnsub=()=>{u1();u2();};
+}
 
 function renderTripList(){
   $('trip-list-body').innerHTML=trips.length?trips.map(t=>`
@@ -629,7 +820,7 @@ window.saveTrip=function(){
     const name=val('tm-name').trim();if(!name)return;
     const cities=parseList(val('tm-cities')),members=parseList(val('tm-members'));
     const startDate=val('tm-start'),endDate=val('tm-end');
-    const data={name,subtitle:val('tm-sub').trim(),startDate,endDate,members,cities,currency:val('tm-currency'),ts:serverTimestamp()};
+    const data={name,subtitle:val('tm-sub').trim(),startDate,endDate,members,cities,currency:val('tm-currency'),ownerId:curUser?.uid||'',memberIds:[],ts:serverTimestamp()};
     setSyncDot('syncing');
     if(editTripId){
       await updateDoc(doc(db,'trips',editTripId),data);
