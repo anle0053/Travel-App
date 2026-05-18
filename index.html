@@ -461,13 +461,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp,getDoc,setDoc,enableIndexedDbPersistence}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const fb=initializeApp({apiKey:"AIzaSyDnY5wcb0QXOPXzAvRmrqltESS_U5afCS8",authDomain:"travel-app-38ad8.firebaseapp.com",projectId:"travel-app-38ad8",storageBucket:"travel-app-38ad8.firebasestorage.app",messagingSenderId:"306708070000",appId:"1:306708070000:web:716f2db183d2e432357eb5"});
 const db=getFirestore(fb);
 const auth=getAuth(fb);
 const gProvider=new GoogleAuthProvider();
+
+// 啟用 Firestore 離線持久化（斷網時仍可讀取快取資料）
+enableIndexedDbPersistence(db).catch(e=>{
+  if(e.code==='failed-precondition')console.warn('Firestore 離線：多個分頁同時開啟，離線功能限制於單一分頁');
+  else if(e.code==='unimplemented')console.warn('此瀏覽器不支援 Firestore 離線功能');
+});
 
 // ── 常數 ──
 const TAG_CLASS={景點:'tag-spot',餐廳:'tag-food',購物:'tag-shop',交通:'tag-move',住宿:'tag-stay'};
@@ -1169,6 +1175,19 @@ window.openSettle=function(){
 };
 
 renderPresets();
+
+// 註冊 Service Worker（App Shell 離線快取）
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('/sw.js').then(reg=>{
+    reg.addEventListener('updatefound',()=>{
+      const nw=reg.installing;
+      nw.addEventListener('statechange',()=>{
+        if(nw.state==='installed'&&navigator.serviceWorker.controller)
+          toast('App 已更新，下次開啟生效');
+      });
+    });
+  }).catch(e=>console.warn('SW 註冊失敗:',e));
+}
 </script>
 </body>
 </html>
