@@ -2,7 +2,7 @@ const KEY=process.env.GOOGLE_API_KEY,CX=process.env.SEARCH_ENGINE_ID;
 const isCN=s=>/[\u4e00-\u9fff]/.test(s);
 const domain=url=>{try{return new URL(url).hostname.replace('www.','');}catch{return '';}};
 
-export default async function handler(req,res){
+module.exports=async function handler(req,res){
   res.setHeader('Access-Control-Allow-Origin','*');
   res.setHeader('Access-Control-Allow-Methods','GET,OPTIONS');
   if(req.method==='OPTIONS')return res.status(200).end();
