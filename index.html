@@ -444,10 +444,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import{getFirestore,collection,addDoc,updateDoc,deleteDoc,doc,onSnapshot,query,orderBy,serverTimestamp,getDoc,getDocs,setDoc,enableIndexedDbPersistence}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getAuth,onAuthStateChanged,signInWithPopup,GoogleAuthProvider,createUserWithEmailAndPassword,signInWithEmailAndPassword,signOut,setPersistence,browserLocalPersistence}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 const fb=initializeApp({apiKey:"AIzaSyDnY5wcb0QXOPXzAvRmrqltESS_U5afCS8",authDomain:"travel-app-38ad8.firebaseapp.com",projectId:"travel-app-38ad8",storageBucket:"travel-app-38ad8.firebasestorage.app",messagingSenderId:"306708070000",appId:"1:306708070000:web:716f2db183d2e432357eb5"});
 const db=getFirestore(fb),auth=getAuth(fb),gProvider=new GoogleAuthProvider();
+// 登入狀態永久保存在 localStorage，關閉分頁或瀏覽器後重開不需要重新登入
+setPersistence(auth,browserLocalPersistence).catch(()=>{});
 enableIndexedDbPersistence(db).catch(()=>{});
 
 // ── 常數 ──
