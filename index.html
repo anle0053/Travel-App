@@ -840,7 +840,9 @@ function renderItinerary(){
         ${cA(s.id)}
         <h4 style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${s.n}</h4>
         <div class="card-meta"><span class="card-tag ${TAG[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${s.note}</span>`:''}</div>
-        <div class="card-members">${mAVs(s.members)}</div></div>`).join('');
+        <div class="card-members">${mAVs(s.members)}</div>
+        ${s.trans?`<div style="display:flex;align-items:center;gap:4px;padding-top:5px;margin-top:4px;border-top:.5px solid var(--border)"><svg width="11" height="11" viewBox="0 0 24 24" stroke="#185fa5" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span style="font-size:10px;color:var(--sub);overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${s.trans}</span></div>`:''}
+        </div>`).join('');
       return`<div style="flex:1;min-width:0;height:90px;margin-right:${ci<nc-1?'6px':'0'}"></div>`;
     }).join('')}</div>`).join('');
   grid.innerHTML=`${timeCol}<div style="flex:1;min-width:0;padding:8px 16px 60px 0">
