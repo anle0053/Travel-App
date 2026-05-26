@@ -89,9 +89,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
 .card-actions{position:absolute;top:6px;right:6px;display:flex;gap:2px}
 .card-btn{background:none;border:none;cursor:pointer;padding:4px;color:#c0c0c5;border-radius:6px}
 .card-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.scroll-bar-wrap{position:absolute;bottom:0;left:44px;right:0;height:30px;background:linear-gradient(transparent,rgba(242,242,247,.95));display:flex;align-items:flex-end;padding:0 8px 6px;pointer-events:none}
-.scroll-bar-track{flex:1;height:3px;background:rgba(0,0,0,.1);border-radius:2px;overflow:hidden}
-.scroll-bar-thumb{height:100%;background:var(--c);border-radius:2px;min-width:20px;transition:width .1s,left .1s}
 /* EXPLORE - 重新設計 */
 .search-bar{display:flex;gap:8px;margin-bottom:14px;align-items:center}
 .search-input{flex:1;padding:11px 14px;border:none;border-radius:12px;font-size:15px;background:#fff;color:#1c1c1e;font-family:inherit;outline:none;box-shadow:0 1px 4px rgba(0,0,0,.06)}
@@ -278,8 +275,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
         </div>
       </div>
       <div class="itin-scroll-wrap">
-        <div class="itin-hscroll" id="itin-hscroll"><div class="itin-grid" id="itin-grid"></div></div>
-        <div class="scroll-bar-wrap"><div class="scroll-bar-track"><div class="scroll-bar-thumb" id="scroll-thumb" style="width:0%"></div></div></div>
+        <div class="itin-hscroll" id="itin-hscroll"><div class="itin-grid" id="itin-grid"></div></div></div>
       </div>
     </div>
     <div class="page" id="page-explore">
@@ -516,10 +512,6 @@ window.showPage=function(id,btn){
 // ── 行程橫向滾動 ──
 const hscroll=$('itin-hscroll');
 let swipeX=0,swipeLock=false;
-hscroll.addEventListener('scroll',()=>{
-  const max=hscroll.scrollWidth-hscroll.clientWidth,pct=max>0?hscroll.scrollLeft/max*100:0;
-  $('scroll-thumb').style.cssText=`width:${Math.max(10,100-pct)}%;margin-left:${pct*.9}%`;
-},{passive:true});
 hscroll.addEventListener('touchstart',e=>{swipeX=e.touches[0].clientX;swipeLock=false;},{passive:true});
 hscroll.addEventListener('touchend',e=>{
   if(swipeLock)return;
@@ -833,24 +825,28 @@ function renderItinerary(){
   const{cols,sCol}=assignCols(ds);
   const nc=Math.max(cols.length,1);
   const times=[...new Set(ds.map(s=>s.t))].sort();
-  const timeCol=`<div style="width:44px;flex-shrink:0;position:sticky;left:0;z-index:10;background:#f2f2f7;padding-top:44px">
-    ${times.map(t=>`<div style="height:90px;display:flex;align-items:flex-start;padding-top:10px;justify-content:flex-end;padding-right:8px"><span style="font-size:10px;color:var(--sub);white-space:nowrap">${t}</span></div>`).join('')}
-    <div style="height:60px"></div></div>`;
   const hdrs=Array.from({length:nc},(_,ci)=>`<div style="flex:1;min-width:0;margin-right:${ci<nc-1?'6px':'0'}">
     <div class="col-header">${cols[ci]?[...cols[ci]].map(m=>`<div class="col-av">${av(m)}</div>`).join(''):'<span class="col-label">行程</span>'}</div></div>`).join('');
   const rows=times.map(t=>`<div style="display:flex;margin-bottom:6px">
     ${Array.from({length:nc},(_,ci)=>{
       const at=ds.filter(s=>s.t===t&&sCol.get(s.id)===ci);
-      if(at.length)return at.map(s=>`<div class="itin-card" style="flex:1;min-width:0;margin-right:${ci<nc-1?'6px':'0'};min-height:82px;margin-bottom:0">
+      if(at.length)return at.map(s=>`<div class="itin-card" style="flex:1;min-width:0;margin-right:${ci<nc-1?'6px':'0'};margin-bottom:0">
         ${cA(s.id)}
-        <h4 style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">${s.n}</h4>
-        <div class="card-meta"><span class="card-tag ${TAG[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${s.note}</span>`:''}</div>
-        <div class="card-members">${mAVs(s.members)}</div>
-        ${s.trans?`<div style="display:flex;align-items:center;gap:4px;padding-top:5px;margin-top:4px;border-top:.5px solid var(--border)"><svg width="11" height="11" viewBox="0 0 24 24" stroke="#185fa5" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span style="font-size:10px;color:var(--sub);overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${s.trans}</span></div>`:''}
+        <div style="display:flex;align-items:flex-start;gap:8px">
+          <div style="background:#e8f4fd;border-radius:8px;padding:4px 7px;flex-shrink:0">
+            <span style="font-size:11px;font-weight:700;color:#185fa5;white-space:nowrap">${s.t}</span>
+          </div>
+          <div style="flex:1;min-width:0">
+            <h4 style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;padding-right:44px">${s.n}</h4>
+            <div class="card-meta"><span class="card-tag ${TAG[s.type]||'tag-spot'}">${s.type}</span>${s.note?`<span style="overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${s.note}</span>`:''}</div>
+            <div class="card-members">${mAVs(s.members)}</div>
+            ${s.trans?`<div style="display:flex;align-items:center;gap:4px;padding-top:5px;margin-top:4px;border-top:.5px solid var(--border)"><svg width="11" height="11" viewBox="0 0 24 24" stroke="#185fa5" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span style="font-size:10px;color:var(--sub);overflow:hidden;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical">${s.trans}</span></div>`:''}
+          </div>
+        </div>
         </div>`).join('');
-      return`<div style="flex:1;min-width:0;height:90px;margin-right:${ci<nc-1?'6px':'0'}"></div>`;
+      return`<div style="flex:1;min-width:0;margin-right:${ci<nc-1?'6px':'0'}"></div>`;
     }).join('')}</div>`).join('');
-  grid.innerHTML=`${timeCol}<div style="flex:1;min-width:0;padding:8px 16px 60px 0">
+  grid.innerHTML=`<div style="flex:1;min-width:0;padding:8px 16px 60px">
     <div style="display:flex;margin-bottom:4px">${hdrs}</div>${rows}</div>`;
 }
 
