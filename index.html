@@ -613,6 +613,8 @@ function startTripListener(){
   window._tripUnsub=onSnapshot(query(collection(db,'trips'),orderBy('ts')),snap=>{
     trips=[];
     snap.forEach(d=>{const t={...d.data(),id:d.id};if(!t.ownerId||t.ownerId===uid||(t.memberIds||[]).includes(uid))trips.push(t);});
+    // 同步當前旅行的頭像（其他成員更新時即時刷新）
+    if(curTripId){const ct=trips.find(x=>x.id===curTripId);if(ct)memberAvatars=ct.avatars||{};}
     renderTripList();
     if(!curTripId&&trips.length>0)selectTrip(trips[0].id);else if(curTripId)renderHome();
   });
@@ -632,9 +634,11 @@ function renderTripList(){
 
 window.selectTrip=function(id){
   curTripId=id;curDay=0;curCatFilter=null;
-  try{memberAvatars=JSON.parse(localStorage.getItem('avatars_'+id)||'{}');}catch(e){memberAvatars={};}
   const t=trips.find(x=>x.id===id);
-  if(t){$('ts-name').textContent=t.name;$('ts-date').textContent=(t.startDate||'')+(t.endDate?' → '+t.endDate:'');$('header-sub').textContent=t.subtitle||t.name;}
+  if(t){
+    memberAvatars=t.avatars||{};
+    $('ts-name').textContent=t.name;$('ts-date').textContent=(t.startDate||'')+(t.endDate?' → '+t.endDate:'');$('header-sub').textContent=t.subtitle||t.name;
+  }
   closeTripList();subscribeTrip();renderHome();
 };
 window.openTripList=()=>$('trip-list-screen').classList.add('open');
@@ -707,10 +711,11 @@ window.openBalloon=function(e,name){
   $('balloon-overlay').classList.add('open');
 };
 window.selectAvatar=function(a){balloonSelAv=a;document.querySelectorAll('.b-avatar-btn').forEach(b=>b.classList.toggle('selected',b.textContent===a));};
-window.saveMemberAvatar=function(){
-  if(!balloonMember)return;memberAvatars[balloonMember]=balloonSelAv;
-  try{localStorage.setItem('avatars_'+curTripId,JSON.stringify(memberAvatars));}catch(e){}
-  closeBalloon();renderHome();toast('頭像已更新');
+window.saveMemberAvatar=async function(){
+  if(!balloonMember||!curTripId)return;
+  memberAvatars[balloonMember]=balloonSelAv;
+  await updateDoc(doc(db,'trips',curTripId),{avatars:memberAvatars});
+  closeBalloon();toast('頭像已更新');
 };
 window.closeBalloon=()=>$('balloon-overlay').classList.remove('open');
 
