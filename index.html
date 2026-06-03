@@ -902,25 +902,8 @@ window.doSearch=async function(){
   }finally{btn.disabled=false;btn.textContent='搜尋';}
 };
 
-function renderSearchResults(results,q){
-  if(!results.length){$('search-results').innerHTML='<div class="empty">沒有找到相關結果<br>試試其他關鍵字</div>';return;}
-  $('search-results').innerHTML=`<div class="search-count">「${q}」找到 ${results.length} 筆結果</div>`+
-    results.map((r,i)=>`<div class="src-card">
-      <div class="src-thumb">${r.thumb?`<img src="${r.thumb}" onerror="this.parentNode.textContent='🔍'">`:' 🔍'}</div>
-      <div class="src-info">
-        <div class="src-title">${r.name}</div>
-        <div class="src-desc">${r.desc}</div>
-        <div class="src-foot">
-          <span class="src-domain">${r.source}</span>
-          <div style="display:flex;gap:6px">
-            <button class="src-link-btn" onclick="window.open('${r.url}','_blank')">查看</button>
-            <button class="src-add-btn" onclick="openAddSearchResult(${i})">＋ 加入</button>
-          </div>
-        </div>
-      </div>
-    </div>`).join('');
-  window._searchResults=results;
-}
+<button class="src-link-btn" onclick="window.open('${r.url}','_blank')">查看</button>
+<button class="src-add-btn" onclick="openAddSearchResult(${i})">＋ 加入</button>
 
 window.openAddSearchResult=function(i){
   if(!curTripId){toast('請先選擇行程');return;}if(!days.length){toast('請先新增天數');return;}
