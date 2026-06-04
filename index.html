@@ -409,6 +409,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue'
     </div>
     <div class="frow"><label>類別</label><select id="e-cat"><option>餐飲</option><option>交通</option><option>景點門票</option><option>購物</option><option>住宿</option><option>其他</option></select></div>
     <div class="frow"><label>日期</label><select id="e-day"></select></div>
+    <div class="frow">
+      <label style="display:flex;justify-content:space-between;align-items:center">參與成員<button class="select-all-btn" onclick="toggleSelectAllExp()">全選／取消</button></label>
+      <div class="member-check-row" id="exp-member-checks"></div>
+    </div>
     <div style="height:.5px;background:#e0e0e0;margin:8px 0"></div>
     <div class="frow"><label>付款明細</label><div id="split-rows"></div><div class="split-total-note" id="split-note"></div></div>
     <div class="modal-btns"><button class="btn-cancel" id="exp-cancel-btn">取消</button><button class="btn-save" id="exp-save-btn" onclick="saveExp()">儲存</button></div>
@@ -470,7 +474,7 @@ let trips=[],curTripId=null,curDay=0,curBudgetDay='all',curCatFilter=null;
 let spots=[],expenses=[],days=[];
 let editSpotId=null,editExpId=null,editTripId=null,aimPlace=null,aimDayIdx=0;
 let balloonMember=null,balloonSelAv=null,memberAvatars={};
-let curUser=null,authMode='login';
+let saving=false,curUser=null,authMode='login';
 
 // ── 工具函式 ──
 const $=(id)=>document.getElementById(id);
@@ -487,9 +491,8 @@ const mAVs=(ms)=>(ms||[]).map(m=>`<div class="card-av">${av(m)}</div>`).join('')
 const catSVG=(cat)=>`<svg width="18" height="18" viewBox="0 0 24 24" stroke="${CAT_FG[cat]||'#555'}" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${CAT_PATH[cat]||CAT_PATH['其他']}</svg>`;
 
 function withLock(btn,fn){
-  if(btn?.disabled)return;
-  if(btn)btn.disabled=true;
-  Promise.resolve(fn()).finally(()=>{if(btn)btn.disabled=false;});
+  if(saving)return;saving=true;if(btn)btn.disabled=true;
+  Promise.resolve(fn()).finally(()=>{saving=false;if(btn)btn.disabled=false;});
 }
 function toast(m){const el=$('toast');el.textContent=m;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
 function setupModal(oid,cid){
@@ -902,8 +905,25 @@ window.doSearch=async function(){
   }finally{btn.disabled=false;btn.textContent='搜尋';}
 };
 
-<button class="src-link-btn" onclick="window.open('${r.url}','_blank')">查看</button>
-<button class="src-add-btn" onclick="openAddSearchResult(${i})">＋ 加入</button>
+function renderSearchResults(results,q){
+  if(!results.length){$('search-results').innerHTML='<div class="empty">沒有找到相關結果<br>試試其他關鍵字</div>';return;}
+  $('search-results').innerHTML=`<div class="search-count">「${q}」找到 ${results.length} 筆結果</div>`+
+    results.map((r,i)=>`<div class="src-card">
+      <div class="src-thumb">${r.thumb?`<img src="${r.thumb}" onerror="this.parentNode.textContent='🔍'">`:' 🔍'}</div>
+      <div class="src-info">
+        <div class="src-title">${r.name}</div>
+        <div class="src-desc">${r.desc}</div>
+        <div class="src-foot">
+          <span class="src-domain">${r.source}</span>
+          <div style="display:flex;gap:6px">
+            <button class="src-link-btn" onclick="window.open('${r.url}','_blank')">查看</button>
+            <button class="src-add-btn" onclick="openAddSearchResult(${i})">＋ 加入</button>
+          </div>
+        </div>
+      </div>
+    </div>`).join('');
+  window._searchResults=results;
+}
 
 window.openAddSearchResult=function(i){
   if(!curTripId){toast('請先選擇行程');return;}if(!days.length){toast('請先新增天數');return;}
@@ -952,9 +972,10 @@ function renderExpenses(){
 }
 
 window.updateSplitFromTotal=function(){
-  const total=parseFloat(val('e-amt'))||0,members=getMembers();if(!members.length)return;
-  const each=Math.round(total/members.length);
-  members.forEach(m=>{const inp=$('split-'+m);if(inp&&!inp.dataset.manual)inp.value=each||'';});
+  const total=parseFloat(val('e-amt'))||0;
+  const participants=getSelectedExpMembers();if(!participants.length)return;
+  const each=Math.round(total/participants.length);
+  getMembers().forEach(m=>{const inp=$('split-'+m);if(inp)inp.value=participants.includes(m)?(inp.dataset.manual?inp.value:each||''):'';});
   updateSplitNote();
 };
 window.updateSplitNote=function(){
@@ -968,6 +989,16 @@ function renderSplitRows(ex={}){
   $('split-rows').innerHTML=members.map(m=>`<div class="split-member-row"><span class="split-name">${m}</span><input class="split-input" id="split-${m}" type="number" placeholder="0" value="${ex[m]!==undefined?ex[m]:each||''}" oninput="this.dataset.manual=1;updateSplitNote()"></div>`).join('');
   updateSplitNote();
 }
+function renderExpMemberChecks(sel=[]){
+  $('exp-member-checks').innerHTML=getMembers().map(m=>`<div class="member-check${sel.includes(m)?' selected':''}" onclick="this.classList.toggle('selected');updateSplitFromTotal()"><div class="mc-av">${av(m)}</div><span class="mc-name">${m}</span></div>`).join('');
+}
+window.toggleSelectAllExp=function(){
+  const checks=document.querySelectorAll('#exp-member-checks .member-check');
+  const all=[...checks].every(c=>c.classList.contains('selected'));
+  checks.forEach(c=>c.classList.toggle('selected',!all));
+  updateSplitFromTotal();
+};
+const getSelectedExpMembers=()=>[...document.querySelectorAll('#exp-member-checks .member-check.selected')].map(el=>el.querySelector('.mc-name').textContent);
 window.openExpModal=function(id){
   editExpId=id||null;const isEdit=!!id;
   $('exp-modal-title').textContent=isEdit?'編輯消費':'新增消費';
@@ -976,13 +1007,15 @@ window.openExpModal=function(id){
   const e=isEdit?expenses.find(x=>x.id===id):null;
   $('e-name').value=e?.name||'';$('e-amt').value=e?.amt||'';
   $('e-cat').value=e?.cat||'餐飲';$('e-day').value=e?.day??curDay;
+  renderExpMemberChecks(e?.participants||getMembers());
   renderSplitRows(e?.splits||{});openModal('exp-modal');
 };
 window.saveExp=function(){
   withLock($('exp-save-btn'),async()=>{
     const name=val('e-name').trim(),amt=parseInt(val('e-amt'))||0;if(!name||!amt||!curTripId)return;
     const splits={};getMembers().forEach(m=>{const v=parseFloat($('split-'+m)?.value||0);if(v)splits[m]=v;});
-    const data={name,amt,cat:val('e-cat'),splits,day:parseInt(val('e-day')),ts:serverTimestamp()};
+    const participants=getSelectedExpMembers();
+    const data={name,amt,cat:val('e-cat'),splits,participants,day:parseInt(val('e-day')),ts:serverTimestamp()};
     if(editExpId)await updateDoc(doc(db,'trips',curTripId,'expenses',editExpId),data);
     else await addDoc(collection(db,'trips',curTripId,'expenses'),data);
     closeModal('exp-modal');toast(editExpId?'消費已更新':'消費已記錄');
@@ -999,7 +1032,9 @@ window.openSettle=function(){
   const paid={},owed={};members.forEach(m=>{paid[m]=0;owed[m]=0;});
   expenses.forEach(e=>{
     if(e.splits)Object.entries(e.splits).forEach(([m,v])=>{if(paid[m]!==undefined)paid[m]+=v;});
-    const share=e.amt/members.length;members.forEach(m=>{owed[m]+=share;});
+    const participants=e.participants?.length?e.participants:members;
+    const share=e.amt/participants.length;
+    participants.forEach(m=>{if(owed[m]!==undefined)owed[m]+=share;});
   });
   const net={};members.forEach(m=>{net[m]=Math.round((paid[m]||0)-(owed[m]||0));});
   const debtors=members.filter(m=>net[m]<0).map(m=>({name:m,amt:-net[m]}));
